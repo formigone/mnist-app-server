@@ -1,0 +1,131 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #aaa;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+}
+
+h1 {
+    width: 100%;
+    margin: 10% auto;
+    text-align: center;
+}
+
+canvas {
+    width: 100%;
+    image-rendering: pixelated;
+}
+
+.card {
+    width: 100%;
+    background: #fff;
+    margin: 24px 0 0;
+    box-shadow: 0 1px 4px #555;
+}
+
+.card_inline {
+    width: 23%;
+}
+
+@media (min-width: 600px) {
+    .card_inline {
+        width: 15%;
+    }
+}
+
+@media (min-width: 1000px) {
+    .card_inline {
+        width: 8.5%;
+    }
+}
+
+@media (min-width: 1300px) {
+    .card_inline {
+        width: 6%;
+    }
+}
+
+.card-toolbar {
+    list-style: none;
+    margin: 0;
+    padding: 5%;
+    background: #fff;
+    display: flex;
+    position: relative;
+}
+
+.card-toolbar_col {
+    flex-grow: 1;
+}
+
+.card-toolbar-prediction {
+    margin: 0;
+    padding: 0;
+    font-size: 2em;
+    text-align: center;
+    font-weight: 100;
+}
+
+.color_prediction-wrong {
+    background: #b22438;
+}
+
+.color_prediction-correct {
+    background: #4a952d;
+}
+
+.color_prediction-unset {
+    background: #ddd;
+}
+
+.card-toolbar-prediction-percentage {
+    margin: 0;
+    padding: 0;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.card-toolbar-bar-graph-shell {
+    height: 100%;
+    background: #ddd;
+    display: flex;
+}
+
+.card-toolbar-bar-graph {
+    background: #555;
+    flex-grow: 1;
+    align-self: flex-end;
+    justify-content: space-between;
+}
+
+.card-toolbar-settings {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #eaeaea;
+    height: 100%;
+    box-shadow: 0 -1px 1px #aaa;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin: 0 0 64px;
+}
+
+.snackbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 1em;
+    margin: 0 5%;
+    font-size: 1em;
+    display: inline;
+    width: auto;
+}

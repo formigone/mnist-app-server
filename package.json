@@ -1,0 +1,17 @@
+{
+  "name": "mnist-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dfrag": "^1.0.1",
+    "express": "^4.16.2",
+    "pug": "^2.0.0-rc.4"
+  }
+}
