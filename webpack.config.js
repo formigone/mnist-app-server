@@ -67,8 +67,11 @@ const config = {
               if (err) {
                 throw err;
               }
+            });
 
-              console.log('Done and done!');
+            Object.keys(bundles).forEach(filename => {
+              console.log(`Copying ${__dirname}/dist/${filename} => ${__dirname}/public/js/${bundles[filename]}`);
+              fs.createReadStream(`${__dirname}/dist/${filename}`).pipe(fs.createWriteStream(`${__dirname}/public/js/${bundles[filename]}`));
             });
           })
           .catch(err => {

@@ -1,41 +1,53 @@
 import EventEmitter from 'events';
 
 import dispatcher from './AppDispatcher';
-import actionTypes from './actionTypes';
+import { types } from './actions';
 
-let STORIES_API = '';
-const STORE_KEY = 'kslcom:queue';
+let API_BASE = null;
 
-/** @type {DefState} defaultState */
-const defaultState = {
-  stories: [],
-  idBlacklist: {},
-  offset: 0,
-  loading: false,
-  continueLoading: true,
+let state = {
+  digits: [],
+  status: '',
 };
 
-/** @type {DefState} state */
-let state = {};
-
 class Store extends EventEmitter {
-  constructor(_state = defaultState) {
+  constructor() {
     super();
-
-    state = _state;
 
     dispatcher.register((payload) => {
       switch (payload.type) {
-        case actionTypes.NEXT_PAGE:
-          next(payload, this.emitChanges.bind(this));
-          break;
-        case actionTypes.RESTORE:
-          restore(this.emitChanges.bind(this));
+        case types.LOAD_DIGITS:
+          state = nextState('status', () => 'Loading...');
+          this.emitChanges();
+
+          loadDigits()
+            .then(() => {
+              this.emitChanges();
+            })
+            .then(() => {
+              let loaded = 0;
+              state.digits.forEach(digit => {
+                loadDigit(digit.key)
+                  .then(() => {
+                    loaded += 1;
+                    this.emitChanges();
+
+                    if (loaded === state.digits.length) {
+                      state = nextState('status', () => '');
+                      this.emitChanges();
+                    }
+                  });
+              });
+            });
           break;
         default:
         // do nothing
       }
     });
+  }
+
+  setApiBase(url) {
+    API_BASE = url;
   }
 
   getState(attr = null) {
@@ -44,17 +56,6 @@ class Store extends EventEmitter {
     }
 
     return state[attr];
-  }
-
-  merge(newState) {
-    state = {
-      ...state,
-      ...newState,
-    };
-  }
-
-  setApiUrl(url) {
-    STORIES_API = url;
   }
 
   emitChanges(event) {
@@ -70,83 +71,41 @@ class Store extends EventEmitter {
   }
 }
 
-function calculateNextState(currState, attr, next) {
+function nextState(attr, next) {
   return {
-    ...currState,
-    [attr]: next(currState[attr]),
+    ...state,
+    [attr]: next(state[attr]),
   };
 }
 
-function genStoreKey() {
-  return `${STORE_KEY}:${window.location.pathname}`;
+function loadDigits() {
+  return new Promise((resolve, reject) => {
+    fetch(`${API_BASE}/digits`)
+      .then(res => res.json())
+      .then(digits => {
+        console.log(digits);
+        state = nextState('digits', () => digits.map((digit) => ({ key: digit })));
+        console.log('state', state)
+        resolve();
+      });
+  });
 }
 
-function save(key, data) {
-  if (typeof data === 'object') {
-    data = JSON.stringify(data);
-  }
-
-  try {
-    window.sessionStorage.setItem(key, data);
-    window.sessionStorage.setItem(`${key}:history`, window.history.length);
-    window.sessionStorage.setItem(`${key}:href`, window.location.href);
-  } catch (e) {
-    // couldn't access session storage
-  }
-}
-
-function restore(emitChanges) {
-  const key = genStoreKey();
-
-  try {
-    if (state.persistPaging) {
-      const backFromTheFuture = window.history.length === Number(window.sessionStorage.getItem(`${key}:history`)) + 1;
-      if (!backFromTheFuture) {
-        window.sessionStorage.removeItem(key);
-        window.sessionStorage.removeItem(`${key}:history`);
-        window.sessionStorage.removeItem(`${key}:href`);
-        return;
-      }
-
-      let data = window.sessionStorage.getItem(key) || '{}';
-      data = JSON.parse(data);
-      if (data) {
-        state = calculateNextState(state, 'stories', stories => data.stories || stories);
-        state = calculateNextState(state, 'offset', offset => data.offset || offset);
-        emitChanges('loaded');
-      }
-    } else {
-      window.sessionStorage.removeItem(key);
-    }
-  } catch (e) {
-    // couldn't access session storage
-  }
-}
-
-function next({ queueTagIds, offset, limit }, emitChanges) {
-  state = calculateNextState(state, 'loading', () => true);
-  fetch(`${STORIES_API}/${queueTagIds}/${offset}/${limit}`)
-    .then(res => res.json())
-    .then((res) => {
-      state = calculateNextState(state, 'stories', stories => [...stories, ...res]);
-      state = calculateNextState(state, 'offset', offset => offset + limit);
-      state = calculateNextState(state, 'loading', () => false);
-
-      if (state.persistPaging) {
-        save(`${STORE_KEY}:${window.location.pathname}`, { stories: state.stories, offset: state.offset });
-      }
-
-      if (res.length < limit) {
-        state = calculateNextState(state, 'continueLoading', () => false);
-      }
-
-      emitChanges('loaded');
-    })
-    .catch((err) => {
-      console.error(err);
-      emitChanges('loaded');
-    });
-  emitChanges();
+function loadDigit(key) {
+  return new Promise((resolve, reject) => {
+    fetch(`${API_BASE}/digit/${key}`)
+      .then(res => res.json())
+      .then(digit => {
+        console.log(digit);
+        state = nextState('digits', (digits) => digits.map((row) => {
+          if (row.key === key) {
+            row.value = digit.response;
+          }
+          return row;
+        }));
+        resolve();
+      });
+  });
 }
 
 export default new Store();

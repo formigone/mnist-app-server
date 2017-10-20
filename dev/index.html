@@ -1,10 +1,12 @@
 <!doctype html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width">
   <title>MNIST App - dev</title>
 </head>
 <body>
 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 <script src="lib/react.js"></script>
 <script src="lib/react-dom.js"></script>
 <script src="main.min.js"></script>
@@ -12,7 +14,9 @@
 <div id="container"></div>
 
 <script>
-  var props = {};
+  var props = {
+    api: 'http://localhost:8088'
+  };
   ReactDOM.render(React.createElement(com.rodrigo_silveira.main, props), document.getElementById('container'));
 </script>
 </body>

@@ -119,7 +119,7 @@ canvas {
 
 .snackbar {
     position: fixed;
-    bottom: 0;
+    bottom: 16px;
     left: 0;
     background: #000;
     color: #fff;
@@ -128,4 +128,33 @@ canvas {
     font-size: 1em;
     display: inline;
     width: auto;
+}
+
+
+.nav {
+    background: #F44336;
+    color: #fff;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 999;
+}
+
+.nav-options {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.nav-options li {
+    padding: 8px 8px 0;
 }

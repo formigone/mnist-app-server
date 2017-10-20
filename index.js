@@ -7,6 +7,8 @@ const jsonParser = bodyParser.json();
 app.set('view engine', 'pug');
 app.use('/public', express.static('public'));
 
+const DEV = process.env.APP_ENV === 'development';
+
 app.post('/v1', jsonParser, (req, res) => {
   console.log(`${new Date()}   POST /v1`);
   if (req.body) {
@@ -22,6 +24,9 @@ app.post('/v1', jsonParser, (req, res) => {
 });
 
 app.get('/digits', (req, res) => {
+  if (DEV) {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
   console.log(`${new Date()}   GET /digits`);
   fs.readdir(`${__dirname}/public/img`, function (err, files) {
     if (err) {
@@ -47,6 +52,9 @@ app.get('/digit/:id', (req, res) => {
   }
 
   fs.readFile(`${__dirname}/public/img/${id}-digit.json`, 'utf8', (err, file) => {
+    if (DEV) {
+      res.header('Access-Control-Allow-Origin', '*');
+    }
     if (err) {
       res.status(404);
       res.end(JSON.stringify({ error: 'Unable to load digit.' }));
