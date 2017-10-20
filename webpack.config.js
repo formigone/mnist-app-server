@@ -26,7 +26,14 @@ const config = {
           plugins: ['transform-es2015-spread'],
         },
       },
+      {
+        test: /\.css$/,
+        loader: `style-loader!css-loader`,
+      },
     ],
+  },
+  devServer: {
+    stats: 'errors-only',
   },
   plugins: [
     new webpack.DefinePlugin({

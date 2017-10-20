@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import './style.css';
+
 import Nav from './components/Nav';
 
 class MnistAppDash extends PureComponent {
