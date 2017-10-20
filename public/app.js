@@ -37,7 +37,7 @@ function drawCanvas(pixels, width, height) {
   return canvas;
 }
 
-function loadDigit(digits, index, cb) {
+function loadDigit(digits, index, container, cb) {
   if (index >= digits.length) {
     return cb();
   }
@@ -64,7 +64,7 @@ function loadDigit(digits, index, cb) {
         container.insertBefore(genCard(digit), children[0]);
       }
 
-      loadDigit(digits, index + 1, cb);
+      loadDigit(digits, index + 1, container, cb);
     });
 }
 
@@ -85,28 +85,56 @@ function genCard(data) {
   return dfrag('div', { className: 'card card_inline' }, [
     canvas,
     dfrag('ul', { className: `card-toolbar ${correct}`, style: 'position: relative' }, [
-      dfrag('li', { style: 'display:none' }, data.pixels),
+      dfrag('li', { style: 'display:none', dataIntent: 'pixels' }, data.pixels),
       dfrag('li', { className: 'card-toolbar_col' }, [
         dfrag('h3', { className: 'card-toolbar-prediction' }, data.prediction || '--'),
       ]),
-      dfrag('li', { className: 'card-toolbar-settings', style: 'display: none' }, [
-        dfrag('button', {}, 'copy')
+      dfrag('li', { className: 'card-toolbar-settings', dataIntent: 'settings', style: 'display: none' }, [
+        dfrag('button', { dataIntent: 'copy' }, 'Copy')
       ]),
     ]),
   ]);
 }
 
-var container = dfrag('div', { className: 'container' });
-var loader = dfrag('h1', { className: 'snackbar' });
+const container = dfrag('div', { className: 'container' });
+const loader = dfrag('h1', { className: 'snackbar' });
 loader.textContent = 'Loading...';
 document.body.appendChild(container);
 document.body.appendChild(loader);
 
-function load() {
+function closest(element, selector) {
+  if (element === document) {
+    return null;
+  }
+
+  const match = element.matches(selector);
+  if (match) {
+    return element;
+  }
+  return closest(element.parentNode, selector);
+}
+
+container.addEventListener('click', (event) => {
+  const target = event.target;
+  const card = closest(target, '.card');
+
+  if (target.nodeName === 'BUTTON') {
+    switch (target.getAttribute('data-intent')) {
+      case 'copy':
+        console.log('COPY')
+        break;
+    }
+  } else if (target.nodeName === 'CANVAS') {
+    const settings = card.querySelector('[data-intent="settings"]');
+    settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+  }
+});
+
+function load(container) {
   fetch('/digits')
     .then(res => res.json())
     .then(json => {
-      loadDigit(json, 0, () => {
+      loadDigit(json, 0, container, () => {
         document.body.removeChild(loader);
       });
     });
@@ -150,4 +178,4 @@ function probs() {
   norm(scale(d.percentages)).map(v => Number(v * 100).toFixed(2) * 1)
 }
 
-load();
+load(container);
