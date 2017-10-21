@@ -60,7 +60,7 @@ app.get('/digit/:id', (req, res) => {
       res.end(JSON.stringify({ error: 'Unable to load digit.' }));
       return;
     }
-    res.end(JSON.stringify({ response: JSON.parse(file) }));
+    res.end(JSON.stringify(JSON.parse(file)));
   });
 });
 

@@ -78,14 +78,49 @@ function nextState(attr, next) {
   };
 }
 
+const cache = {
+  get(key) {
+    return new Promise((resolve) => {
+      try {
+        let data = window.localStorage.getItem(key);
+        if (data) {
+          console.log('hit', key);
+          data = JSON.parse(data);
+        }
+        resolve(data);
+      } catch (error) {
+        resolve(data);
+      }
+    });
+  },
+  set(key, data) {
+    return new Promise((resolve) => {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(data));
+        resolve(data);
+      } catch (error) {
+        resolve(data);
+      }
+    });
+  },
+  remove(key) {
+    return new Promise((resolve) => {
+      try {
+        window.localStorage.removeItem(key);
+        resolve();
+      } catch (error) {
+        resolve();
+      }
+    });
+  },
+};
+
 function loadDigits() {
   return new Promise((resolve, reject) => {
     fetch(`${API_BASE}/digits`)
       .then(res => res.json())
       .then(digits => {
-        console.log(digits);
         state = nextState('digits', () => digits.map((digit) => ({ key: digit })));
-        console.log('state', state)
         resolve();
       });
   });
@@ -93,13 +128,20 @@ function loadDigits() {
 
 function loadDigit(key) {
   return new Promise((resolve, reject) => {
-    fetch(`${API_BASE}/digit/${key}`)
-      .then(res => res.json())
-      .then(digit => {
-        console.log(digit);
+    cache.get(key)
+      .then((digit) => {
+        if (digit) {
+          return digit;
+        }
+
+        return fetch(`${API_BASE}/digit/${key}`)
+          .then((res) => res.json())
+          .then((digit) => cache.set(key, digit));
+      })
+      .then((digit) => {
         state = nextState('digits', (digits) => digits.map((row) => {
           if (row.key === key) {
-            row.value = digit.response;
+            row.value = digit;
           }
           return row;
         }));

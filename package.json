@@ -5,7 +5,7 @@
   "author": "Rodrigo Silveira",
   "scripts": {
     "start": "node index.js",
-    "dev-server": "APP_ENV=development node index.js",
+    "api-server": "APP_ENV=development node index.js",
     "build": "rm public/js/* ; NODE_ENV=production webpack -p --define --progress --colors",
     "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dev --hot --inline --progress --colors --port 2001"
   },
