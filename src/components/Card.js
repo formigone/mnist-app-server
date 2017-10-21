@@ -3,8 +3,8 @@ import React from 'react';
 
 import Canvas from './Canvas';
 
-const Card = ({ pixels, prediction = null }) => (
-  <div className="card card_inline">
+const Card = ({ pixels, prediction = null, onClick, selected }) => (
+  <div className={`card card_inline ${selected ? 'card_selected' : ''}`} onClick={onClick}>
     <Canvas pixels={pixels} />
     <ul className="card-toolbar color_prediction-unset">
       <li className="card-toolbar_col"><h3 className="card-toolbar-prediction">{prediction || '--'}</h3></li>
@@ -19,7 +19,10 @@ const Card = ({ pixels, prediction = null }) => (
 );
 
 Card.propTypes = {
-  description: PropTypes.string,
+  pixels: PropTypes.arrayOf(PropTypes.number),
+  prediction: PropTypes.number,
+  onClick: PropTypes.func,
+  selected: PropTypes.bool,
 };
 
 export default Card;

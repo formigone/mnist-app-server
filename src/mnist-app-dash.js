@@ -41,8 +41,14 @@ class MnistAppDash extends PureComponent {
       <div>
         <Nav />
         <div className="container">
-        {state.digits.map(digit => (digit.value ? <Card key={digit.key} pixels={digit.value.pixels} prediction={digit.value.prediction} /> : null))}
-        {/*{state.digits.map(digit => (<p key={digit.key}>{digit.key}</p>))}*/}
+        {state.digits.map(digit => (digit.value ? (
+          <Card
+            key={digit.key}
+            pixels={digit.value.pixels}
+            prediction={digit.value.prediction}
+            selected={digit.selected}
+            onClick={() => actions.select(digit)} />
+          ) : null))}
         </div>
         <SnackBar msg={state.status} />
       </div>

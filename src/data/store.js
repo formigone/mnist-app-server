@@ -7,6 +7,7 @@ let API_BASE = null;
 
 let state = {
   digits: [],
+  selection: [],
   status: '',
 };
 
@@ -16,6 +17,10 @@ class Store extends EventEmitter {
 
     dispatcher.register((payload) => {
       switch (payload.type) {
+        case types.SELECT_CARD:
+          selectDigit(payload.digit)
+            .then(() => this.emitChanges());
+          break;
         case types.LOAD_DIGITS:
           state = nextState('status', () => 'Loading...');
           this.emitChanges();
@@ -147,6 +152,19 @@ function loadDigit(key) {
         }));
         resolve();
       });
+  });
+}
+
+function selectDigit(digit) {
+  return new Promise((resolve) => {
+    state = nextState('selection', (selection) => [...selection, digit]);
+    state = nextState('digits', (digits) => digits.map((row) => {
+      if (row.key === digit.key) {
+        row.selected = !(Boolean(row.selected));
+      }
+      return row;
+    }));
+    resolve();
   });
 }
 
