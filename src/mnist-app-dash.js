@@ -13,7 +13,7 @@ import SnackBar from './components/SnackBar';
 class MnistAppDash extends PureComponent {
   static propTypes = {
     api: PropTypes.string,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -39,7 +39,7 @@ class MnistAppDash extends PureComponent {
     const { state } = this;
     return (
       <div>
-        <Nav />
+        <Nav selection={state.selection} allSelected={state.selection.length === state.digits.length} />
         <div className="container">
         {state.digits.map(digit => (digit.value ? (
           <Card

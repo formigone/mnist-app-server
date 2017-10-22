@@ -161,6 +161,15 @@ canvas {
     justify-content: flex-start;
 }
 
+.nav-status {
+    display: flex;
+    align-items: center;
+}
+
+.nav-status-text {
+    padding: 0 8px;
+}
+
 .nav-options li {
     padding: 8px 8px 0;
 }

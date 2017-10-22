@@ -21,6 +21,14 @@ class Store extends EventEmitter {
           selectDigit(payload.digit)
             .then(() => this.emitChanges());
           break;
+        case types.SELECT_ALL:
+          selectAll(true)
+            .then(() => this.emitChanges());
+          break;
+        case types.DESELECT_ALL:
+          selectAll(false)
+            .then(() => this.emitChanges());
+          break;
         case types.LOAD_DIGITS:
           state = nextState('status', () => 'Loading...');
           this.emitChanges();
@@ -155,15 +163,30 @@ function loadDigit(key) {
   });
 }
 
+function getSelected(digits) {
+  return digits.filter(row => row.selected);
+}
+
 function selectDigit(digit) {
   return new Promise((resolve) => {
-    state = nextState('selection', (selection) => [...selection, digit]);
     state = nextState('digits', (digits) => digits.map((row) => {
       if (row.key === digit.key) {
         row.selected = !(Boolean(row.selected));
       }
       return row;
     }));
+    state = nextState('selection', () => getSelected(state.digits));
+    resolve();
+  });
+}
+
+function selectAll(select) {
+  return new Promise((resolve) => {
+    state = nextState('digits', (digits) => digits.map((row) => {
+      row.selected = select;
+      return row;
+    }));
+    state = nextState('selection', () => getSelected(state.digits));
     resolve();
   });
 }
