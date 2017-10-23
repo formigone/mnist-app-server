@@ -3,7 +3,7 @@ import React from 'react';
 
 import actions from '../data/actions';
 
-const Nav = ({ icon, picture, selection, allSelected }) => (
+const Nav = ({ icon, admin, picture, selection, allSelected }) => (
   <nav className="nav">
     <div className="nav-status">
       <img src={icon} />
@@ -17,7 +17,7 @@ const Nav = ({ icon, picture, selection, allSelected }) => (
         <li><i className="fa fa-refresh" title="Reload" /></li>
         <li onClick={() => actions.selectAll()}><i className="fa fa-check-square-o" title="Select all" /></li>
         {picture && (
-          <li className="user-icon"><img src={picture} /></li>
+          <li onClick={() => actions.logout()} className="user-icon"><img src={picture} /></li>
         )}
         {!picture && (
           <li onClick={() => actions.showModal('login')}><i className="fa fa-sign-in" title="Login" /></li>
@@ -29,10 +29,12 @@ const Nav = ({ icon, picture, selection, allSelected }) => (
       <ul className="nav-options">
         <li><i className="fa fa-floppy-o" title="Save as" /></li>
         <li><i className="fa fa-bar-chart" title="Details" /></li>
-        <li><i className="fa fa-trash-o" title="Delete" /></li>
+        {admin && (
+          <li><i className="fa fa-trash-o" title="Delete" /></li>
+        )}
         <li onClick={() => actions.deselectAll()}><i className="fa fa-square-o" title="Deselect all" /></li>
         {picture && (
-          <li className="user-icon"><img src={picture} /></li>
+          <li onClick={() => actions.logout()} className="user-icon"><img src={picture} /></li>
         )}
         {!picture && (
           <li onClick={() => actions.showModal('login')}><i className="fa fa-sign-in" title="Login" /></li>
@@ -43,6 +45,9 @@ const Nav = ({ icon, picture, selection, allSelected }) => (
 );
 
 Nav.propTypes = {
+  admin: PropTypes.bool,
+  icon: PropTypes.string,
+  picture: PropTypes.string,
   selection: PropTypes.arrayOf(PropTypes.object),
   allSelected: PropTypes.bool,
 };

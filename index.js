@@ -34,9 +34,6 @@ app.post('/v1', jsonParser, (req, res) => {
 });
 
 app.get('/digits', (req, res) => {
-  if (DEV) {
-    res.header('Access-Control-Allow-Origin', '*');
-  }
   console.log(`${new Date()}   GET /digits`);
   fs.readdir(`${__dirname}/public/img`, function (err, files) {
     if (err) {
@@ -74,11 +71,17 @@ app.get('/digit/:id', (req, res) => {
   });
 });
 
-app.all('/login', jsonParser, (req, res) => {
-  if (DEV) {
-    res.header('Access-Control-Allow-Origin', '*');
-  }
+app.all('/logout', (req, res) => {
+  console.log(`${new Date()}   GET /logout`);
+  req.session.user = {};
+  req.session.destroy((err) => {
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ user: req.session }));
+  });
+});
 
+app.all('/login', jsonParser, (req, res) => {
+  console.log(`${new Date()}   Request: ${req.url}  User: ${JSON.stringify(req.session.user)}`);
   res.setHeader('content-type', 'application/json');
 
   if (req.body && req.body.token) {
@@ -104,8 +107,14 @@ app.all('/login', jsonParser, (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log(`${new Date()}   Request: ${req.url}  User: ${req.session.user}`);
-  res.render('index', { user: JSON.stringify(req.session.user || {}), app: BUNDLE['main.min.js'], GOOG });
+  console.log(`${new Date()}   Request: ${req.url}  User: ${JSON.stringify(req.session.user)}`);
+  res.render('index', {
+    user: JSON.stringify(req.session.user || {}),
+    app: DEV ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
+    GOOG,
+    dev: DEV,
+    API_HOST: ''
+  });
 });
 
 app.all('/*', (req, res) => {

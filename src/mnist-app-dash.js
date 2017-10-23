@@ -25,6 +25,7 @@ class MnistAppDash extends PureComponent {
 
   constructor(props) {
     super(props);
+    store.init(this.props);
     store.setApiBase(this.props.api);
     this.state = store.getState();
     this.handleChange = this.handleChange.bind(this);
@@ -45,11 +46,14 @@ class MnistAppDash extends PureComponent {
 
   render() {
     const { state, props } = this;
-    console.log('MODAL: ', state.modals.login);
-    console.log('state.modals.login', state.modals.login)
     return (
       <div>
-        <Nav icon={props.icon} picture={props.user.picture} selection={state.selection} allSelected={state.selection.length === state.digits.length} />
+        <Nav
+          admin={state.user.admin}
+          icon={props.icon}
+          picture={props.user.picture}
+          selection={state.selection}
+          allSelected={state.selection.length === state.digits.length} />
         <div className="container">
         {state.digits.map(digit => (digit.value ? (
           <Card

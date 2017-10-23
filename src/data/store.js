@@ -6,6 +6,7 @@ import { types } from './actions';
 let API_BASE = null;
 
 let state = {
+  user: {},
   digits: [],
   selection: [],
   status: '',
@@ -19,10 +20,15 @@ class Store extends EventEmitter {
     super();
 
     dispatcher.register((payload) => {
-      console.log('---');
-      console.log(`ACTION: ${payload.type}`, payload);
-      console.log('---');
+      console.group('Action');
+      console.log(`${payload.type}: `, payload);
+      console.groupEnd('Action');
       switch (payload.type) {
+        case types.LOGOUT:
+          logout().then(() => {
+            window.location.reload();
+          });
+          break;
         case types.SHOW_MODAL:
           showModal(payload.modal)
             .then(() => this.emitChanges());
@@ -73,6 +79,10 @@ class Store extends EventEmitter {
     });
   }
 
+  init(defaultState = {}) {
+    state = {...state, ...defaultState};
+  }
+
   setApiBase(url) {
     API_BASE = url;
   }
@@ -98,6 +108,33 @@ class Store extends EventEmitter {
   }
 }
 
+const onSignIn = (googleUser) => {
+  if (state.user.email) {
+    return;
+  }
+
+  var token = googleUser.getAuthResponse().id_token;
+  var headers = new Headers();
+
+  headers.append('Accept', 'application/json');
+  headers.append('Content-Type', 'application/json');
+
+  fetch(`${API_BASE}/login`, {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify({ token }),
+    mode: 'cors',
+    headers: headers,
+  })
+    .then(res => {
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+};
+window.onSignIn = onSignIn;
+
 function nextState(attr, next) {
   return {
     ...state,
@@ -111,7 +148,6 @@ const cache = {
       try {
         let data = window.localStorage.getItem(key);
         if (data) {
-          console.log('hit', key);
           data = JSON.parse(data);
         }
         resolve(data);
@@ -229,6 +265,18 @@ function closeModals() {
 
     state = nextState('modals', () => newModals);
     resolve();
+  });
+}
+
+function logout() {
+  return new Promise((resolve) => {
+    const auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut()
+      .then(() => fetch(`${API_BASE}/logout`))
+      .then(() => {
+        auth2.disconnect();
+        resolve();
+      });
   });
 }
 

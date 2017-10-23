@@ -14,6 +14,7 @@ export const types = {
   DESELECT_ALL: 'deselect-all',
   SHOW_MODAL: 'show-modal',
   CLOSE_MODALS: 'close-modals',
+  LOGOUT: 'logout',
 };
 
 const Actions = {
@@ -34,6 +35,9 @@ const Actions = {
   },
   closeModals() {
     return dispatcher.dispatch(genPayload(types.CLOSE_MODALS));
+  },
+  logout() {
+    return dispatcher.dispatch(genPayload(types.LOGOUT));
   },
 };
 
