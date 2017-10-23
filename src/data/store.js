@@ -9,6 +9,9 @@ let state = {
   digits: [],
   selection: [],
   status: '',
+  modals: {
+    login: false,
+  },
 };
 
 class Store extends EventEmitter {
@@ -16,7 +19,18 @@ class Store extends EventEmitter {
     super();
 
     dispatcher.register((payload) => {
+      console.log('---');
+      console.log(`ACTION: ${payload.type}`, payload);
+      console.log('---');
       switch (payload.type) {
+        case types.SHOW_MODAL:
+          showModal(payload.modal)
+            .then(() => this.emitChanges());
+          break;
+        case types.CLOSE_MODALS:
+          closeModals()
+            .then(() => this.emitChanges());
+          break;
         case types.SELECT_CARD:
           selectDigit(payload.digit)
             .then(() => this.emitChanges());
@@ -187,6 +201,33 @@ function selectAll(select) {
       return row;
     }));
     state = nextState('selection', () => getSelected(state.digits));
+    resolve();
+  });
+}
+
+function showModal(modal) {
+  return new Promise((resolve) => {
+    const newModals = {};
+    Object.keys(state.modals).forEach((key) => {
+      newModals[key] = false;
+      if (modal === key) {
+        newModals[key] = true;
+      }
+    });
+
+    state = nextState('modals', () => newModals);
+    resolve();
+  });
+}
+
+function closeModals() {
+  return new Promise((resolve) => {
+    const newModals = {};
+    Object.keys(state.modals).forEach((key) => {
+      newModals[key] = false;
+    });
+
+    state = nextState('modals', () => newModals);
     resolve();
   });
 }

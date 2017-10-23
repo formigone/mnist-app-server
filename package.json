@@ -13,6 +13,8 @@
     "body-parser": "^1.18.2",
     "dfrag": "^1.0.1",
     "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "google-auth-library": "^0.11.0",
     "pug": "^2.0.0-rc.4"
   },
   "devDependencies": {

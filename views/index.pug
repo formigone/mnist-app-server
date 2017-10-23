@@ -4,11 +4,49 @@ html(lang="en")
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='google-signin-scope', content='profile email')
+    meta(name='google-signin-client_id', content=GOOG.clientId)
     title= 'MNIST App'
     link(rel= 'icon' type= 'image/png' href= '/public/favicon-16x16.png' sizes= '16x16')
     link(rel= 'icon' type= 'image/png' href= '/public/favicon-32x32.png' sizes= '32x32')
     link(href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", rel="stylesheet", integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN", crossorigin="anonymous")
     link(href= '/public/styles.css' rel= 'stylesheet')
+    script(src= 'https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.min.js')
+    script(src= 'https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.min.js')
+    script(src= '/public/js/' + app)
+    script(src= 'https://apis.google.com/js/platform.js' async defer)
   body
-    script(src= '/public/dfrag.min.js')
-    script(src= '/public/app.js')
+    #container
+    script
+      | var props = {
+      |     api: '',
+      |     icon: '/public/favicon-32x32.png',
+      |     user: !{user}
+      |   };
+      |   ReactDOM.render(React.createElement(com.rodrigo_silveira.main, props), document.getElementById('container'));
+      |
+      |   function onSignIn(googleUser) {
+      |     if (props.user.email) {
+      |        return;
+      |     }
+      |     var token = googleUser.getAuthResponse().id_token;
+      |     var headers = new Headers();
+      |
+      |     headers.append('Accept', 'application/json');
+      |     headers.append('Content-Type', 'application/json');
+      |
+      |     fetch('http://localhost:8088/login', {
+      |       method: 'POST',
+      |       credentials: 'include',
+      |       body: JSON.stringify({ token }),
+      |       mode: 'cors',
+      |       headers: headers,
+      |     })
+      |       .then(res => {
+      |         console.log('res', res);
+      |       })
+      |       .catch(error => {
+      |         console.error('error', error);
+      |       });
+      |   };
+      |

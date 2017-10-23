@@ -9,10 +9,18 @@ import actions from './data/actions';
 import Nav from './components/Nav';
 import Card from './components/Card';
 import SnackBar from './components/SnackBar';
+import Modal from './components/Modal';
+import ModalContent from './components/ModalContent';
 
 class MnistAppDash extends PureComponent {
   static propTypes = {
     api: PropTypes.string,
+    icon: PropTypes.string,
+    user: PropTypes.shape({
+      email: PropTypes.string,
+      picture: PropTypes.string,
+      admi: PropTypes.bool,
+    }),
   };
 
   constructor(props) {
@@ -36,10 +44,12 @@ class MnistAppDash extends PureComponent {
   }
 
   render() {
-    const { state } = this;
+    const { state, props } = this;
+    console.log('MODAL: ', state.modals.login);
+    console.log('state.modals.login', state.modals.login)
     return (
       <div>
-        <Nav selection={state.selection} allSelected={state.selection.length === state.digits.length} />
+        <Nav icon={props.icon} picture={props.user.picture} selection={state.selection} allSelected={state.selection.length === state.digits.length} />
         <div className="container">
         {state.digits.map(digit => (digit.value ? (
           <Card
@@ -49,6 +59,15 @@ class MnistAppDash extends PureComponent {
             selected={digit.selected}
             onClick={() => actions.select(digit)} />
           ) : null))}
+        </div>
+        <h1>{state.modals.login}</h1>
+        <div style={{ display: (state.modals.login ? 'block' : 'none') }}>
+          <Modal>
+            <ModalContent>
+              <h1 className="modal-content_title">Sign in with</h1>
+              <div className="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+            </ModalContent>
+          </Modal>
         </div>
         <SnackBar msg={state.status} />
       </div>

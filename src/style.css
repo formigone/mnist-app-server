@@ -173,3 +173,46 @@ canvas {
 .nav-options li {
     padding: 8px 8px 0;
 }
+
+li.user-icon {
+    padding: 0 8px;
+}
+.user-icon img {
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+}
+
+.modal-btn-close {
+    display: block;
+    border: 0;
+    font-size: 2em;
+    background: transparent;
+    margin: 16px;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 500px;
+    background: #fff;
+    box-shadow: 0 4px 16px #aaa;
+    margin: 16px auto;
+    padding: 32px;
+    box-sizing: border-box;
+}
+
+.modal-content_title {
+    margin: 0 0 32px;
+    text-align: left;
+    font-size: 1.5em;
+}

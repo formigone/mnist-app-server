@@ -12,6 +12,8 @@ export const types = {
   SELECT_CARD: 'select-card',
   SELECT_ALL: 'select-all',
   DESELECT_ALL: 'deselect-all',
+  SHOW_MODAL: 'show-modal',
+  CLOSE_MODALS: 'close-modals',
 };
 
 const Actions = {
@@ -26,6 +28,12 @@ const Actions = {
   },
   deselectAll() {
     return dispatcher.dispatch(genPayload(types.DESELECT_ALL));
+  },
+  showModal(modal) {
+    return dispatcher.dispatch(genPayload(types.SHOW_MODAL, { modal }));
+  },
+  closeModals() {
+    return dispatcher.dispatch(genPayload(types.CLOSE_MODALS));
   },
 };
 
