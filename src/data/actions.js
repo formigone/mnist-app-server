@@ -15,6 +15,8 @@ export const types = {
   SHOW_MODAL: 'show-modal',
   CLOSE_MODALS: 'close-modals',
   LOGOUT: 'logout',
+  DELETE_PROMPT: 'delete-prompt',
+  DELETE: 'delete',
 };
 
 const Actions = {
@@ -38,6 +40,12 @@ const Actions = {
   },
   logout() {
     return dispatcher.dispatch(genPayload(types.LOGOUT));
+  },
+  deletePrompt() {
+    return dispatcher.dispatch(genPayload(types.DELETE_PROMPT));
+  },
+  deleteAll() {
+    return dispatcher.dispatch(genPayload(types.DELETE));
   },
 };
 

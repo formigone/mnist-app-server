@@ -12,6 +12,7 @@ let state = {
   status: '',
   modals: {
     login: false,
+    delete: false,
   },
 };
 
@@ -20,10 +21,22 @@ class Store extends EventEmitter {
     super();
 
     dispatcher.register((payload) => {
-      console.group('Action');
-      console.log(`${payload.type}: `, payload);
-      console.groupEnd('Action');
+      console.groupCollapsed(`Action - ${payload.type}`);
+      console.log(payload);
+      console.groupEnd();
+
       switch (payload.type) {
+        case types.DELETE_PROMPT:
+          deletePrompt().then(() => this.emitChanges());
+          break;
+        case types.DELETE:
+          state = nextState('status', () => 'Deleting...');
+          this.emitChanges();
+          deleteAll().then(() => {
+            state = nextState('status', () => '');
+            this.emitChanges();
+          });
+          break;
         case types.LOGOUT:
           logout().then(() => {
             window.location.reload();
@@ -80,7 +93,7 @@ class Store extends EventEmitter {
   }
 
   init(defaultState = {}) {
-    state = {...state, ...defaultState};
+    state = { ...state, ...defaultState };
   }
 
   setApiBase(url) {
@@ -113,8 +126,8 @@ const onSignIn = (googleUser) => {
     return;
   }
 
-  var token = googleUser.getAuthResponse().id_token;
-  var headers = new Headers();
+  const token = googleUser.getAuthResponse().id_token;
+  const headers = new Headers();
 
   headers.append('Accept', 'application/json');
   headers.append('Content-Type', 'application/json');
@@ -123,8 +136,7 @@ const onSignIn = (googleUser) => {
     method: 'POST',
     credentials: 'include',
     body: JSON.stringify({ token }),
-    mode: 'cors',
-    headers: headers,
+    headers,
   })
     .then(res => {
       window.location.reload();
@@ -275,6 +287,51 @@ function logout() {
       .then(() => fetch(`${API_BASE}/logout`, { credentials: 'include' }))
       .then(() => {
         auth2.disconnect();
+        resolve();
+      });
+  });
+}
+
+function deletePrompt() {
+  return new Promise((resolve) => {
+    closeModals();
+    state = nextState('modals', (modals) => ({ ...modals, ...{ 'delete': true } }));
+    resolve();
+  });
+}
+
+function deleteAll() {
+  return new Promise((resolve) => {
+    const selections = state.selection.map(selection => selection.key);
+    const headers = new Headers();
+
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+
+    fetch(`${API_BASE}/digits`, {
+      credentials: 'include',
+      method: 'DELETE',
+      body: JSON.stringify(selections),
+      headers,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Could not delete digits');
+        }
+      })
+      .then(() => {
+        state = nextState('digits', (digits) => digits.filter((digit) => !digit.selected));
+        state = nextState('selection', () => getSelected(state.digits));
+        closeModals();
+        resolve();
+      })
+      .catch((error) => {
+        state = nextState('digits', (digits) => digits.map(digit => {
+          digit.selected = false;
+          return digit;
+        }));
+        state = nextState('selection', () => getSelected(state.digits));
+        closeModals();
         resolve();
       });
   });

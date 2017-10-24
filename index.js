@@ -1,3 +1,5 @@
+const compression = require('compression');
+const morgan = require('morgan');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -9,6 +11,9 @@ const GOOG = JSON.parse(fs.readFileSync(`${__dirname}/goog.json`));
 const BUNDLE = JSON.parse(fs.readFileSync(`${__dirname}/configs/bundles.json`));
 
 const jsonParser = bodyParser.json();
+
+app.use(compression());
+app.use(morgan('combined'));
 app.set('view engine', 'pug');
 app.use('/public', express.static('public'));
 app.use(session({
@@ -20,7 +25,6 @@ app.use(session({
 const DEV = process.env.APP_ENV === 'development';
 
 app.post('/v1', jsonParser, (req, res) => {
-  console.log(`${new Date()}   POST /v1`);
   if (req.body) {
     fs.writeFile(`/home/rodrigo/mnist-app/img/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
       if (err) {
@@ -34,7 +38,6 @@ app.post('/v1', jsonParser, (req, res) => {
 });
 
 app.get('/digits', (req, res) => {
-  console.log(`${new Date()}   GET /digits`);
   fs.readdir(`${__dirname}/public/img`, function (err, files) {
     if (err) {
       throw err;
@@ -45,12 +48,59 @@ app.get('/digits', (req, res) => {
       return str ? str[1] : null;
     }).filter(file => file);
     console.log(`${files.length} digits found`);
+    res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify(files));
   });
 });
 
+function deleteFiles(files, callback){
+  const file = files.pop();
+  if (!file) {
+    callback();
+  } else {
+    console.log(`Deleting ${file}`);
+    fs.unlink(file, (error) => {
+      if (error) {
+        console.error(error);
+        callback(error);
+      } else {
+        deleteFiles(files, callback);
+      }
+    });
+  }
+}
+
+app.delete('/digits', jsonParser, (req, res) => {
+  res.setHeader('content-type', 'application/json');
+  if (!req.session.user.admin) {
+    res.status(403);
+    res.end(JSON.stringify({ error: 'Unauthorized action.' }));
+    return;
+  }
+
+  const files = (req.body || [])
+    .filter((file) => file.replace(/[^\d-]/g, ''))
+    .filter((file) => file)
+    .map((file) => `${__dirname}/public/img/${file}-digit.json`);
+
+  if (files.length === 0) {
+    res.status(400);
+    res.end(JSON.stringify({ error: 'Invalid items.' }));
+    return;
+  }
+
+  deleteFiles(files, (error) => {
+    if (error) {
+      res.status(500);
+      res.end(JSON.stringify({ error: 'Could not delete file(s).' }));
+      return;
+    }
+
+    res.end(JSON.stringify({ success: `Deleted ${req.body.length} item(s)` }));
+  });
+});
+
 app.get('/digit/:id', (req, res) => {
-  console.log(`${new Date()}   GET /digit/id`);
   const id = String(req.params.id);
   if (!id.match(/\d+-\d+/)) {
     res.status(404);
@@ -59,20 +109,17 @@ app.get('/digit/:id', (req, res) => {
   }
 
   fs.readFile(`${__dirname}/public/img/${id}-digit.json`, 'utf8', (err, file) => {
-    if (DEV) {
-      res.header('Access-Control-Allow-Origin', '*');
-    }
     if (err) {
       res.status(404);
       res.end(JSON.stringify({ error: 'Unable to load digit.' }));
       return;
     }
+    res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify(JSON.parse(file)));
   });
 });
 
 app.all('/logout', (req, res) => {
-  console.log(`${new Date()}   GET /logout`);
   req.session.user = {};
   req.session.destroy((err) => {
     res.setHeader('content-type', 'application/json');
@@ -81,7 +128,6 @@ app.all('/logout', (req, res) => {
 });
 
 app.all('/login', jsonParser, (req, res) => {
-  console.log(`${new Date()}   Request: ${req.url}  User: ${JSON.stringify(req.session.user)}`);
   res.setHeader('content-type', 'application/json');
 
   if (req.body && req.body.token) {
@@ -107,7 +153,6 @@ app.all('/login', jsonParser, (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log(`${new Date()}   Request: ${req.url}  User: ${JSON.stringify(req.session.user)}`);
   res.render('index', {
     user: JSON.stringify(req.session.user || {}),
     app: DEV ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
@@ -118,7 +163,6 @@ app.get('/', (req, res) => {
 });
 
 app.all('/*', (req, res) => {
-  console.log(`${new Date()}   Request: ${req.url}`);
   res.setHeader('content-type', 'application/json');
   res.status(404);
   res.end(JSON.stringify({ status: 'error' }));

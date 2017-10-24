@@ -11,6 +11,9 @@ class Canvas extends PureComponent {
   }
 
   renderCanvas(canvas, pixels) {
+    if (!canvas) {
+      return null;
+    }
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let px = ctx.getImageData(0, 0, canvas.width, canvas.height);

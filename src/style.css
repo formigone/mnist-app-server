@@ -120,7 +120,7 @@ canvas {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    margin: 0 0 64px;
+    margin: 40px 0 64px;
 }
 
 .snackbar {
@@ -148,7 +148,6 @@ canvas {
     left: 0;
     width: 100%;
     box-sizing: border-box;
-    position: relative;
     z-index: 999;
 }
 
@@ -214,5 +213,19 @@ li.user-icon {
 .modal-content_title {
     margin: 0 0 32px;
     text-align: left;
-    font-size: 1.5em;
+    font-size: 1.25em;
+}
+
+.btn {
+    border: none;
+    background: transparent;
+    padding: 8px;
+    font-size: 1em;
+    margin: 8px;
+    cursor: pointer;
+    color: #4285f4;
+}
+
+.btn:hover {
+    background: #eee;
 }

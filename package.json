@@ -4,17 +4,19 @@
   "main": "index.js",
   "author": "Rodrigo Silveira",
   "scripts": {
-    "start": "node index.js",
-    "api-server": "APP_ENV=development node index.js",
+    "start": "pm2 start ecosystem.config.js",
+    "api-server": "APP_ENV=development node index.js --trace-sync-io",
     "build": "rm public/js/* ; NODE_ENV=production webpack -p --define --progress --colors",
     "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dev --hot --inline --progress --colors --port 2001"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
     "dfrag": "^1.0.1",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "google-auth-library": "^0.11.0",
+    "morgan": "^1.9.0",
     "pug": "^2.0.0-rc.4"
   },
   "devDependencies": {
