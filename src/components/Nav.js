@@ -14,7 +14,7 @@ const Nav = ({ icon, admin, picture, selection, allSelected }) => (
 
     {selection.length === 0 && (
       <ul className="nav-options">
-        <li><i className="fa fa-refresh" title="Reload" /></li>
+        <li style={{opacity: 0.3}}><i className="fa fa-refresh" title="Reload" /></li>
         <li onClick={() => actions.selectAll()}><i className="fa fa-check-square-o" title="Select all" /></li>
         {picture && (
           <li onClick={() => actions.logout()} className="user-icon"><img src={picture} /></li>
@@ -27,8 +27,8 @@ const Nav = ({ icon, admin, picture, selection, allSelected }) => (
 
     {selection.length > 0 && (
       <ul className="nav-options">
-        <li><i className="fa fa-floppy-o" title="Save as" /></li>
-        <li><i className="fa fa-bar-chart" title="Details" /></li>
+        <li style={{opacity: 0.3}}><i className="fa fa-floppy-o" title="Save as" /></li>
+        <li style={{opacity: 0.3}}><i className="fa fa-bar-chart" title="Details" /></li>
         {admin && (
           <li onClick={() => actions.deletePrompt()}><i className="fa fa-trash-o" title="Delete" /></li>
         )}
