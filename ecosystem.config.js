@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'mnist',
       script: './index.js',
-      watch: true,
+      watch: false,
       env: {
         'PORT': 3000,
         'NODE_ENV': 'production'

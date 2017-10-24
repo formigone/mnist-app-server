@@ -77,8 +77,7 @@ class MnistAppDash extends PureComponent {
         {state.modals.delete && (
           <Modal>
             <ModalContent>
-              <h1 className="modal-content_title">Are you sure you want to delete {state.selection.length}
-                item{state.selection.length !== 1 ? 's' : ''}?</h1>
+              <h1 className="modal-content_title">Are you sure you want to delete {state.selection.length} item{state.selection.length !== 1 ? 's' : ''}?</h1>
               <button onClick={() => actions.closeModals()} className="btn">Cancel</button>
               <button onClick={() => actions.deleteAll()} className="btn">Delete</button>
             </ModalContent>
