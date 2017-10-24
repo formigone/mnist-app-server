@@ -55,14 +55,15 @@ class MnistAppDash extends PureComponent {
           selection={state.selection}
           allSelected={state.selection.length === state.digits.length} />
         <div className="container">
-        {state.digits.map(digit => (digit.value ? (
-          <Card
-            key={digit.key}
-            pixels={digit.value.pixels}
-            prediction={digit.value.prediction}
-            selected={digit.selected}
-            onClick={() => actions.select(digit)} />
-          ) : null))}
+          {state.digits.map(digit => (digit.value ? (
+              <Card
+                key={digit.key}
+                pixels={digit.value.pixels}
+                prediction={digit.value.prediction}
+                selected={digit.selected}
+                preDelete={digit.preDelete}
+                onClick={() => actions.select(digit)} />
+            ) : null))}
         </div>
         <h1>{state.modals.login}</h1>
         <div style={{ display: (state.modals.login ? 'block' : 'none') }}>
@@ -76,7 +77,8 @@ class MnistAppDash extends PureComponent {
         {state.modals.delete && (
           <Modal>
             <ModalContent>
-              <h1 className="modal-content_title">Are you sure you want to delete {state.selection.length} item{state.selection.length !== 1 ? 's' : ''}?</h1>
+              <h1 className="modal-content_title">Are you sure you want to delete {state.selection.length}
+                item{state.selection.length !== 1 ? 's' : ''}?</h1>
               <button onClick={() => actions.closeModals()} className="btn">Cancel</button>
               <button onClick={() => actions.deleteAll()} className="btn">Delete</button>
             </ModalContent>

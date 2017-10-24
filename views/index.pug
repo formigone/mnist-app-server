@@ -18,9 +18,7 @@ html(lang="en")
   body
     #container
     script
-      | var props = {
-      |     api: '!{API_HOST}',
-      |     icon: '/public/favicon-32x32.png',
-      |     user: !{user}
-      |   };
-      |   ReactDOM.render(React.createElement(com.rodrigo_silveira.main, props), document.getElementById('container'));
+      | ReactDOM.render(React.createElement(com.rodrigo_silveira.main, { api: '!{API_HOST}', icon: '/public/favicon-32x32.png', user: !{user} }), document.getElementById('container'));
+    script(async src="https://www.googletagmanager.com/gtag/js?id=UA-15090706-5")
+    script
+      | window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-15090706-5');

@@ -23,7 +23,7 @@ canvas {
     background: #fff;
     margin: 24px 0 0;
     box-shadow: 0 1px 4px #555;
-    transition: border 0.05s;
+    transition: all 1s ease-out, border 0.05s;
 }
 
 .card_inline {
@@ -228,4 +228,11 @@ li.user-icon {
 
 .btn:hover {
     background: #eee;
+}
+
+.card_fadeout {
+    box-sizing: border-box;
+    transform: rotate3d(1, 1, 1, 500deg) scale(0.25);
+    opacity: 0.25;
+    border: none;
 }

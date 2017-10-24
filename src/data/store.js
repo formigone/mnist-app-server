@@ -32,10 +32,16 @@ class Store extends EventEmitter {
         case types.DELETE:
           state = nextState('status', () => 'Deleting...');
           this.emitChanges();
-          deleteAll().then(() => {
-            state = nextState('status', () => '');
-            this.emitChanges();
-          });
+          preDeleteAll()
+            .then(() => this.emitChanges());
+
+          setTimeout(() => {
+            deleteAll()
+              .then(() => {
+                state = nextState('status', () => '');
+                this.emitChanges();
+              });
+          }, 1000);
           break;
         case types.LOGOUT:
           logout().then(() => {
@@ -320,6 +326,13 @@ function deleteAll() {
         }
       })
       .then(() => {
+        state.selection.forEach(({ key }) => {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (e) {
+            // ignore
+          }
+        });
         state = nextState('digits', (digits) => digits.filter((digit) => !digit.selected));
         state = nextState('selection', () => getSelected(state.digits));
         closeModals();
@@ -331,9 +344,21 @@ function deleteAll() {
           return digit;
         }));
         state = nextState('selection', () => getSelected(state.digits));
-        closeModals();
         resolve();
       });
+  });
+}
+
+function preDeleteAll() {
+  return new Promise((resolve) => {
+    state = nextState('digits', (digits) => digits.map((digit) => {
+      if (digit.selected) {
+        digit.preDelete = true;
+      }
+      return digit;
+    }));
+    closeModals();
+    resolve();
   });
 }
 
