@@ -13,6 +13,7 @@ let state = {
   modals: {
     login: false,
     delete: false,
+    details: false,
   },
 };
 

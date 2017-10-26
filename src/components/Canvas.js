@@ -48,7 +48,7 @@ class Canvas extends PureComponent {
 
   render() {
     return (
-      <canvas width="28" height="28" ref={(el) => this.renderCanvas(el, this.props.pixels)} />
+      <canvas width="28" height="28" className={this.props.className} ref={(el) => this.renderCanvas(el, this.props.pixels)} />
     )
   }
 }

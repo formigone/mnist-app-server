@@ -170,7 +170,8 @@ canvas {
 }
 
 .nav-options li {
-    padding: 8px 8px 0;
+    padding: 4px 8px 0;
+    font-size: 1.5em;
 }
 
 li.user-icon {
@@ -208,6 +209,8 @@ li.user-icon {
     margin: 16px auto;
     padding: 32px;
     box-sizing: border-box;
+    max-height: 85%;
+    overflow-y: auto;
 }
 
 .modal-content_title {
@@ -235,4 +238,65 @@ li.user-icon {
     transform: rotate3d(1, 1, 1, 500deg) scale(0.25);
     opacity: 0.25;
     border: none;
+}
+
+.digit-details {
+    display: flex;
+    padding: 32px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.digit-details:last-child {
+    border: none;
+}
+
+.prediction-container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    align-self: center;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.prediction {
+    font-size: 2em;
+    text-align: center;
+    padding: 8px 0;
+    cursor: default;
+}
+
+.prediction-wrong {
+    color: #b22438;
+}
+
+.prediction-correct {
+    color: #4a952d;
+}
+
+.bar-graph {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    background: #fafafa;
+}
+
+.bar-graph li {
+    height: 10%;
+    background: #F44336;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+@keyframes stretch {
+    from {
+        width: 0%;
+    }
+}
+
+.digit-details_sample {
+    width: 100px;
+    height: 100px;
+    margin: 0 16px;
 }

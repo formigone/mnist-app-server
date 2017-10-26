@@ -8,6 +8,7 @@ import actions from './data/actions';
 
 import Nav from './components/Nav';
 import Card from './components/Card';
+import DigitDetail from './components/DigitDetail';
 import SnackBar from './components/SnackBar';
 import Modal from './components/Modal';
 import ModalContent from './components/ModalContent';
@@ -80,6 +81,13 @@ class MnistAppDash extends PureComponent {
               <h1 className="modal-content_title">Are you sure you want to delete {state.selection.length} item{state.selection.length !== 1 ? 's' : ''}?</h1>
               <button onClick={() => actions.closeModals()} className="btn">Cancel</button>
               <button onClick={() => actions.deleteAll()} className="btn">Delete</button>
+            </ModalContent>
+          </Modal>
+        )}
+        {state.modals.details && (
+          <Modal>
+            <ModalContent>
+              {state.selection.map((digit) => <DigitDetail key={digit.key} {...digit.value} />)}
             </ModalContent>
           </Modal>
         )}

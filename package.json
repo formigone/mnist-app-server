@@ -6,8 +6,8 @@
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
     "api-server": "APP_ENV=development node index.js --trace-sync-io",
-    "build": "rm public/js/* ; NODE_ENV=production webpack -p --define --progress --colors",
-    "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dev --hot --inline --progress --colors --port 2001"
+    "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dev --hot --inline --progress --colors --port 2001",
+    "build": "rm public/js/* ; NODE_ENV=production webpack -p --define --progress --colors"
   },
   "dependencies": {
     "body-parser": "^1.18.2",

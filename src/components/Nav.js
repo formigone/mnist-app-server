@@ -28,7 +28,7 @@ const Nav = ({ icon, admin, picture, selection, allSelected }) => (
     {selection.length > 0 && (
       <ul className="nav-options">
         <li style={{opacity: 0.3}}><i className="fa fa-floppy-o" title="Save as" /></li>
-        <li style={{opacity: 0.3}}><i className="fa fa-bar-chart" title="Details" /></li>
+        <li onClick={() => actions.showModal('details')}><i className="fa fa-bar-chart" title="Details" /></li>
         {admin && (
           <li onClick={() => actions.deletePrompt()}><i className="fa fa-trash-o" title="Delete" /></li>
         )}
