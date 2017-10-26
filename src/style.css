@@ -131,6 +131,7 @@ canvas {
 
 .snackbar {
     position: fixed;
+    z-index: 9999;
     bottom: 16px;
     left: 0;
     background: #000;

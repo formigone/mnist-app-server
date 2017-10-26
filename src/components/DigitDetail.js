@@ -68,7 +68,7 @@ const BarGraph = ({ percentages = [] }) => {
   return (
     <ul className="bar-graph">
       {percentages.map((percentage, i) => (
-        <li key={`percentage/${i}`} style={{animation: 'stretch 0.5s', width: `${percentage}%`}} />
+        <li key={`percentage/${i}`} style={{animation: 'stretch 0.5s ease-out', width: `${percentage}%`}} />
       ))}
     </ul>
   );

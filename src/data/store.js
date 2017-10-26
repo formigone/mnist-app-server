@@ -374,13 +374,31 @@ function preDeleteAll() {
 
 function setCorrect(key, correct) {
   return new Promise((resolve) => {
-    state = nextState('digits', (digits) => digits.map((digit) => {
-      if (digit.key === key) {
-        digit.value.correct = correct
-      }
-      return digit;
-    }));
-    resolve();
+    const headers = new Headers();
+
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+
+    fetch(`${API_BASE}/digit`, {
+      method: 'PUT',
+      credentials: 'include',
+      body: JSON.stringify({ id: key, correct }),
+      headers,
+    })
+      .then((res) => res.json())
+      .then(() => {
+        let data = null;
+        state = nextState('digits', (digits) => digits.map((digit) => {
+          if (digit.key === key) {
+            digit.value.correct = correct;
+            data = digit;
+          }
+          return digit;
+        }));
+        return data;
+      })
+      .then((digit) => cache.set(key, digit))
+      .then(() => resolve());
   });
 }
 

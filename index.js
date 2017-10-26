@@ -23,10 +23,11 @@ app.use(session({
 }));
 
 const DEV = process.env.APP_ENV === 'development';
+const DIGITS_PATH = `${__dirname}/public/img`;
 
 app.post('/v1', jsonParser, (req, res) => {
   if (req.body) {
-    fs.writeFile(`/home/rodrigo/mnist-app/img/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
+    fs.writeFile(`${DIGITS_PATH}/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
       if (err) {
         console.error(err);
         return;
@@ -38,7 +39,7 @@ app.post('/v1', jsonParser, (req, res) => {
 });
 
 app.get('/digits', (req, res) => {
-  fs.readdir(`${__dirname}/public/img`, function (err, files) {
+  fs.readdir(DIGITS_PATH, function (err, files) {
     if (err) {
       throw err;
     }
@@ -81,7 +82,7 @@ app.delete('/digits', jsonParser, (req, res) => {
   const files = (req.body || [])
     .filter((file) => file.replace(/[^\d-]/g, ''))
     .filter((file) => file)
-    .map((file) => `${__dirname}/public/img/${file}-digit.json`);
+    .map((file) => `${DIGITS_PATH}/${file}-digit.json`);
 
   if (files.length === 0) {
     res.status(400);
@@ -100,6 +101,51 @@ app.delete('/digits', jsonParser, (req, res) => {
   });
 });
 
+app.put('/digit', jsonParser, (req, res) => {
+  res.setHeader('content-type', 'application/json');
+  if (!req.session.user.admin) {
+    res.status(403);
+    res.end(JSON.stringify({ error: 'Unauthorized action.' }));
+    return;
+  }
+
+  const id = String(req.params.id);
+  if (!id.match(/\d+-\d+/)) {
+    res.status(404);
+    res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
+    return;
+  }
+
+  const correct = req.params.correct;
+  if (correct === undefined) {
+    res.status(400);
+    res.end(JSON.stringify({ error: 'Missing required parameter "correct"' }));
+    return;
+  }
+
+  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
+    if (err) {
+      res.status(404);
+      res.end(JSON.stringify({ error: 'Unable to load digit.' }));
+      return;
+    }
+
+    const digit = JSON.stringify(JSON.parse(file));
+    digit.correct = correct;
+
+    fs.writeFile(`/img/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
+      if (err) {
+        res.status(404);
+        res.end(JSON.stringify({ error: 'Unable to load digit.' }));
+        return;
+      }
+
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify({ success: true, digit }));
+    });
+  });
+});
+
 app.get('/digit/:id', (req, res) => {
   const id = String(req.params.id);
   if (!id.match(/\d+-\d+/)) {
@@ -108,7 +154,7 @@ app.get('/digit/:id', (req, res) => {
     return;
   }
 
-  fs.readFile(`${__dirname}/public/img/${id}-digit.json`, 'utf8', (err, file) => {
+  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
     if (err) {
       res.status(404);
       res.end(JSON.stringify({ error: 'Unable to load digit.' }));
