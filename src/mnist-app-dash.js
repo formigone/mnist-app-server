@@ -61,6 +61,7 @@ class MnistAppDash extends PureComponent {
                 key={digit.key}
                 pixels={digit.value.pixels}
                 prediction={digit.value.prediction}
+                correct={digit.value.correct}
                 selected={digit.selected}
                 preDelete={digit.preDelete}
                 onClick={() => actions.select(digit)} />
@@ -87,7 +88,7 @@ class MnistAppDash extends PureComponent {
         {state.modals.details && (
           <Modal>
             <ModalContent>
-              {state.selection.map((digit) => <DigitDetail key={digit.key} {...digit.value} />)}
+              {state.selection.map((digit) => <DigitDetail key={digit.key} {...digit.value} onSetCorrect={(correct) => actions.setCorrect(digit.key, correct)} />)}
             </ModalContent>
           </Modal>
         )}

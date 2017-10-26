@@ -17,6 +17,7 @@ export const types = {
   LOGOUT: 'logout',
   DELETE_PROMPT: 'delete-prompt',
   DELETE: 'delete',
+  SET_CORRECT: 'set-correct',
 };
 
 const Actions = {
@@ -46,6 +47,9 @@ const Actions = {
   },
   deleteAll() {
     return dispatcher.dispatch(genPayload(types.DELETE));
+  },
+  setCorrect(key, correct) {
+    return dispatcher.dispatch(genPayload(types.SET_CORRECT, { key, correct }));
   },
 };
 

@@ -44,6 +44,15 @@ class Store extends EventEmitter {
               });
           }, 1000);
           break;
+        case types.SET_CORRECT:
+          state = nextState('status', () => 'Updating...');
+          this.emitChanges();
+          setCorrect(payload.key, payload.correct)
+            .then(() => {
+              state = nextState('status', () => '');
+              this.emitChanges();
+            });
+          break;
         case types.LOGOUT:
           logout().then(() => {
             window.location.reload();
@@ -359,6 +368,18 @@ function preDeleteAll() {
       return digit;
     }));
     closeModals();
+    resolve();
+  });
+}
+
+function setCorrect(key, correct) {
+  return new Promise((resolve) => {
+    state = nextState('digits', (digits) => digits.map((digit) => {
+      if (digit.key === key) {
+        digit.value.correct = correct
+      }
+      return digit;
+    }));
     resolve();
   });
 }

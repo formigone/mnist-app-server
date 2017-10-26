@@ -57,6 +57,10 @@ canvas {
     position: relative;
 }
 
+.card-toolbar.color_prediction-correct, .card-toolbar.color_prediction-wrong {
+    color: #fff;
+}
+
 .card-toolbar_col {
     flex-grow: 1;
 }
@@ -257,6 +261,9 @@ li.user-icon {
     align-self: center;
     color: #aaa;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
 }
 
 .prediction {
