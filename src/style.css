@@ -51,7 +51,7 @@ canvas {
 .card-toolbar {
     list-style: none;
     margin: 0;
-    padding: 5%;
+    padding: 0;
     background: #fff;
     display: flex;
     position: relative;
@@ -69,8 +69,10 @@ canvas {
     margin: 0;
     padding: 0;
     font-size: 2em;
+    line-height: 1.5em;
     text-align: center;
     font-weight: 100;
+    transition: all 0.5s;
 }
 
 .color_prediction-wrong {

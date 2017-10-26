@@ -21,11 +21,11 @@ Digit.propTypes = {
 
 const Prediction = ({ prediction, correct, onSetCorrect }) => (
   <ul className="prediction-container">
-    <li onClick={() => onSetCorrect(true)} className={correct !== undefined && (correct ? 'prediction-correct' : 'prediction-wrong')}>
+    <li onClick={() => onSetCorrect(true)} className={correct === true ? 'prediction-correct' : ''}>
       <span className="fa fa-chevron-up"/>
     </li>
     <li className="prediction">{prediction || '--'}</li>
-    <li onClick={() => onSetCorrect(false)} className={correct !== undefined && (correct ? 'prediction-correct' : 'prediction-wrong')}>
+    <li onClick={() => onSetCorrect(false)} className={correct === false ? 'prediction-wrong' : ''}>
       <span className="fa fa-chevron-down"/>
     </li>
   </ul>
