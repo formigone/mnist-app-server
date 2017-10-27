@@ -88,18 +88,24 @@ class Store extends EventEmitter {
             })
             .then(() => {
               let loaded = 0;
-              state.digits.forEach(digit => {
-                loadDigit(digit.key)
-                  .then(() => {
+              const next = (digits, i) => {
+                loadDigit(digits[i].key)
+                  .then((cache) => {
                     loaded += 1;
-                    this.emitChanges();
+                    if (!cache && loaded % 25 === 0) {
+                      this.emitChanges();
+                    }
 
                     if (loaded === state.digits.length) {
                       state = nextState('status', () => '');
                       this.emitChanges();
+                    } else {
+                      // setTimeout(() => next(digits, i + 1), 0);
+                      next(digits, i + 1);
                     }
                   });
-              });
+              };
+              next(state.digits, 0);
             });
           break;
         default:
@@ -222,21 +228,24 @@ function loadDigit(key) {
     cache.get(key)
       .then((digit) => {
         if (digit) {
-          return digit;
+          return { digit, cache: true };
         }
 
         return fetch(`${API_BASE}/digit/${key}`)
           .then((res) => res.json())
-          .then((digit) => cache.set(key, digit));
+          .then((digit) => {
+            cache.set(key, digit);
+            return { digit, cache: false };
+          });
       })
-      .then((digit) => {
+      .then(({ digit, cache }) => {
         state = nextState('digits', (digits) => digits.map((row) => {
           if (row.key === key) {
             row.value = digit;
           }
           return row;
         }));
-        resolve();
+        resolve(cache);
       });
   });
 }
@@ -397,7 +406,7 @@ function setCorrect(key, correct) {
         }));
         return data;
       })
-      .then((digit) => cache.set(key, digit))
+      .then((digit) => cache.set(key, digit.value))
       .then(() => resolve());
   });
 }

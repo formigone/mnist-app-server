@@ -109,20 +109,20 @@ app.put('/digit', jsonParser, (req, res) => {
     return;
   }
 
-  const id = String(req.params.id);
+  const { id, correct } = req.body;
   if (!id.match(/\d+-\d+/)) {
     res.status(404);
     res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
     return;
   }
 
-  const correct = req.params.correct;
   if (correct === undefined) {
     res.status(400);
     res.end(JSON.stringify({ error: 'Missing required parameter "correct"' }));
     return;
   }
 
+  console.log(`Updating digit ${DIGITS_PATH}/${id}-digit.json`);
   fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
     if (err) {
       res.status(404);
@@ -130,13 +130,13 @@ app.put('/digit', jsonParser, (req, res) => {
       return;
     }
 
-    const digit = JSON.stringify(JSON.parse(file));
+    const digit = JSON.parse(file);
     digit.correct = correct;
 
-    fs.writeFile(`/img/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
+    fs.writeFile(`${DIGITS_PATH}/${id}-digit.json`, JSON.stringify(digit), (err) => {
       if (err) {
         res.status(404);
-        res.end(JSON.stringify({ error: 'Unable to load digit.' }));
+        res.end(JSON.stringify({ error: 'Unable to save digit.' }));
         return;
       }
 
