@@ -143,7 +143,6 @@ canvas {
     width: auto;
 }
 
-
 .nav {
     background: #F44336;
     color: #fff;
@@ -184,6 +183,7 @@ canvas {
 li.user-icon {
     padding: 0 8px;
 }
+
 .user-icon img {
     width: 28px;
     height: 28px;
@@ -249,6 +249,7 @@ li.user-icon {
 
 .digit-details {
     display: flex;
+    flex-wrap: wrap;
     padding: 32px 0;
     border-bottom: 1px solid #eee;
 }
@@ -295,8 +296,6 @@ li.user-icon {
 .bar-graph li {
     height: 10%;
     background: #F44336;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
 }
 
 @keyframes stretch {
@@ -309,4 +308,15 @@ li.user-icon {
     width: 100px;
     height: 100px;
     margin: 0 16px;
+}
+
+.digit-details_summary {
+    width: 100%;
+    text-align: right;
+    color: #555;
+    margin: 8px 0 0;
+}
+
+.digit-details_sub_summary {
+    color: #aaa;
 }
