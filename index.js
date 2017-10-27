@@ -49,6 +49,7 @@ app.get('/digits', (req, res) => {
       return str ? str[1] : null;
     }).filter(file => file);
     console.log(`${files.length} digits found`);
+    files = files.reverse();
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify(files));
   });
