@@ -71,7 +71,7 @@ function deleteFiles(files, callback){
   }
 }
 
-app.delete('/digits', jsonParser, (req, res) => {
+app.delete('/digit', jsonParser, (req, res) => {
   res.setHeader('content-type', 'application/json');
   if (!req.session.user.admin) {
     res.status(403);

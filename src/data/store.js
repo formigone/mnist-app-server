@@ -333,7 +333,7 @@ function deleteAll() {
     headers.append('Accept', 'application/json');
     headers.append('Content-Type', 'application/json');
 
-    fetch(`${API_BASE}/digits`, {
+    fetch(`${API_BASE}/digit`, {
       credentials: 'include',
       method: 'DELETE',
       body: JSON.stringify(selections),
