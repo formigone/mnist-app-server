@@ -1,11 +1,14 @@
 const compression = require('compression');
 const morgan = require('morgan');
 const express = require('express');
+const http = require('http');
+const https = require('https');
 const bodyParser = require('body-parser');
-const app = express();
 const session = require('express-session');
 const fs = require('fs');
 const GoogleAuth = require('google-auth-library');
+
+const app = express();
 
 const GOOG = JSON.parse(fs.readFileSync(`${__dirname}/goog.json`));
 const BUNDLE = JSON.parse(fs.readFileSync(`${__dirname}/configs/bundles.json`));
@@ -216,5 +219,12 @@ app.all('/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 8088;
-app.listen(PORT);
+
+const sslOptions = {
+  key: fs.readFileSync(`${__dirname}/ssl/private.key`),
+  cert: fs.readFileSync(`${__dirname}/ssl/certificate.crt`),
+};
+
+https.createServer(sslOptions, app).listen(PORT);
+// app.listen(PORT);
 console.log(`${new Date()}  Server running on :${PORT}`);
