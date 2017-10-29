@@ -27,6 +27,7 @@ app.use(session({
 
 const DEV = process.env.APP_ENV === 'development';
 const DIGITS_PATH = `${__dirname}/public/img`;
+const APP_LINKS_CERT = `${__dirname}/.well-known/assetlinks.json`;
 
 app.post('/v1', jsonParser, (req, res) => {
   if (req.body) {
@@ -44,7 +45,8 @@ app.post('/v1', jsonParser, (req, res) => {
 app.get('/digits', (req, res) => {
   fs.readdir(DIGITS_PATH, function (err, files) {
     if (err) {
-      throw err;
+      res.status(404);
+      res.end(JSON.stringify({ error: 'Could not find digits map.' }));
     }
 
     files = files.map(file => {
@@ -212,6 +214,19 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('content-type', 'application/json');
+  fs.readFile(APP_LINKS_CERT, function (err, cert) {
+    if (err) {
+      res.status(404);
+      console.error(err);
+      res.end(JSON.stringify({ error: 'Cert not found.' }));
+    }
+
+    res.end(cert);
+  });
+});
+
 app.all('/*', (req, res) => {
   res.setHeader('content-type', 'application/json');
   res.status(404);
@@ -225,6 +240,9 @@ const sslOptions = {
   cert: fs.readFileSync(`${__dirname}/ssl/certificate.crt`),
 };
 
-https.createServer(sslOptions, app).listen(PORT);
-// app.listen(PORT);
+if (DEV) {
+  app.listen(PORT);
+} else {
+  https.createServer(sslOptions, app).listen(PORT);
+}
 console.log(`${new Date()}  Server running on :${PORT}`);
