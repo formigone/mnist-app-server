@@ -22,9 +22,11 @@ class Store extends EventEmitter {
     super();
 
     dispatcher.register((payload) => {
-      console.groupCollapsed(`Action - ${payload.type}`);
-      console.log(payload);
-      console.groupEnd();
+      if (process.env.NODE_ENV === 'development') {
+        console.groupCollapsed(`Action - ${payload.type}`);
+        console.log(payload);
+        console.groupEnd();
+      }
 
       switch (payload.type) {
         case types.DELETE_PROMPT:
@@ -43,6 +45,10 @@ class Store extends EventEmitter {
                 this.emitChanges();
               });
           }, 1000);
+          break;
+        case types.CLASSIFY:
+          classifyInApp()
+            .then(() => this.emitChanges());
           break;
         case types.SET_CORRECT:
           state = nextState('status', () => 'Updating...');
@@ -408,6 +414,15 @@ function setCorrect(key, correct) {
       })
       .then((digit) => cache.set(key, digit.value))
       .then(() => resolve());
+  });
+}
+
+function classifyInApp() {
+  return new Promise((resolve) => {
+    const data = state.selection.map(({ key, value: { pixels }}) => ({ key, pixels }));
+    const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify(data))};end`;
+    window.location.href = href;
+    resolve();
   });
 }
 

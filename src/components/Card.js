@@ -7,7 +7,7 @@ const Card = ({ pixels, prediction = null, correct, onClick, selected, preDelete
   <div className={`card card_inline ${selected ? 'card_selected' : ''} ${preDelete ? 'card_fadeout' : ''}`} onClick={onClick}>
     <Canvas pixels={pixels} />
     <ul className={`card-toolbar color_prediction-${correct === undefined ? 'unset' : (correct ? 'correct' : 'wrong')}`}>
-      <li className="card-toolbar_col"><h3 className="card-toolbar-prediction">{prediction || '--'}</h3></li>
+      <li className="card-toolbar_col"><h3 className="card-toolbar-prediction">{prediction === undefined ? '--' : prediction}</h3></li>
 
       {1 > 2 && (
         <li className="card-toolbar-settings">

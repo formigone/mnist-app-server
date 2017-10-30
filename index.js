@@ -207,6 +207,7 @@ app.all('/login', jsonParser, (req, res) => {
 
 app.get('/', (req, res) => {
   res.render('index', {
+    isAndroid: DEV || Boolean(req.headers['user-agent'].match(/android/i)),
     user: JSON.stringify(req.session.user || {}),
     app: (DEV && !IS_VM) ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
     GOOG,

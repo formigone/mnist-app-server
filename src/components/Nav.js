@@ -30,6 +30,9 @@ const Nav = ({ icon, admin, picture, selection, allSelected }) => (
         <li style={{opacity: 0.3}}><i className="fa fa-floppy-o" title="Save as" /></li>
         <li onClick={() => actions.showModal('details')}><i className="fa fa-bar-chart" title="Details" /></li>
         {admin && (
+          <li onClick={() => actions.classify()}><i className="fa fa-send-o" title="Classifys" /></li>
+        )}
+        {admin && (
           <li onClick={() => actions.deletePrompt()}><i className="fa fa-trash-o" title="Delete" /></li>
         )}
         <li onClick={() => actions.deselectAll()}><i className="fa fa-square-o" title="Deselect all" /></li>

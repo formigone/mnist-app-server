@@ -17,7 +17,9 @@ class MnistAppDash extends PureComponent {
   static propTypes = {
     api: PropTypes.string,
     icon: PropTypes.string,
+    isAndroid: PropTypes.bool,
     user: PropTypes.shape({
+      token: PropTypes.string,
       email: PropTypes.string,
       picture: PropTypes.string,
       admi: PropTypes.bool,
@@ -61,16 +63,11 @@ class MnistAppDash extends PureComponent {
                 key={digit.key}
                 pixels={digit.value.pixels}
                 prediction={digit.value.prediction}
-                correct={digit.value.correct}
+                actual={digit.value.correct}
                 selected={digit.selected}
                 preDelete={digit.preDelete}
                 onClick={() => {
-                  {/*actions.select(digit)*/}
-                  const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify({
-                    key: digit.key,
-                    pixels: digit.value.pixels }))};end`;
-                  window.location.href = href;
-                  console.log(href);
+                  actions.select(digit)
                 }} />
             ) : null))}
         </div>

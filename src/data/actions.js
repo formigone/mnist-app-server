@@ -18,6 +18,7 @@ export const types = {
   DELETE_PROMPT: 'delete-prompt',
   DELETE: 'delete',
   SET_CORRECT: 'set-correct',
+  CLASSIFY: 'classify',
 };
 
 const Actions = {
@@ -50,6 +51,9 @@ const Actions = {
   },
   setCorrect(key, correct) {
     return dispatcher.dispatch(genPayload(types.SET_CORRECT, { key, correct }));
+  },
+  classify() {
+    return dispatcher.dispatch(genPayload(types.CLASSIFY));
   },
 };
 
