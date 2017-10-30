@@ -64,7 +64,14 @@ class MnistAppDash extends PureComponent {
                 correct={digit.value.correct}
                 selected={digit.selected}
                 preDelete={digit.preDelete}
-                onClick={() => actions.select(digit)} />
+                onClick={() => {
+                  {/*actions.select(digit)*/}
+                  const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify({
+                    key: digit.key,
+                    pixels: digit.value.pixels }))};end`;
+                  window.location.href = href;
+                  console.log(href);
+                }} />
             ) : null))}
         </div>
         <h1>{state.modals.login}</h1>

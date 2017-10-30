@@ -26,6 +26,7 @@ app.use(session({
 }));
 
 const DEV = process.env.APP_ENV === 'development';
+const IS_VM = process.env.IS_VM;
 const DIGITS_PATH = `${__dirname}/public/img`;
 const APP_LINKS_CERT = `${__dirname}/.well-known/assetlinks.json`;
 
@@ -207,7 +208,7 @@ app.all('/login', jsonParser, (req, res) => {
 app.get('/', (req, res) => {
   res.render('index', {
     user: JSON.stringify(req.session.user || {}),
-    app: DEV ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
+    app: (DEV && !IS_VM) ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
     GOOG,
     dev: DEV,
     API_HOST: ''
