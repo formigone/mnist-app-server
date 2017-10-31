@@ -419,7 +419,7 @@ function setCorrect(key, correct) {
 
 function classifyInApp() {
   return new Promise((resolve) => {
-    const data = state.selection.map(({ key, value: { pixels }}) => ({ key, pixels }));
+    const data = state.selection.map(({ key, value: { pixels }}) => ({ id: key, pixels }));
     const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify(data))};end`;
     window.location.href = href;
     resolve();

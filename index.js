@@ -31,16 +31,27 @@ const DIGITS_PATH = `${__dirname}/public/img`;
 const APP_LINKS_CERT = `${__dirname}/.well-known/assetlinks.json`;
 
 app.post('/v1', jsonParser, (req, res) => {
-  if (req.body) {
-    fs.writeFile(`${DIGITS_PATH}/${Date.now()}-${Math.random() * 100 | 0}-digit.json`, JSON.stringify(req.body), (err) => {
-      if (err) {
-        console.error(err);
-        return;
+  let filename = `${Date.now()}-${Math.random() * 100 | 0}`;
+  const body = req.body;
+  if (body) {
+    if (!Array.isArray(body.digits)) {
+      body.digits = [Object.assign({}, body)];
+    }
+
+    body.digits.forEach((digit, i) => {
+      if (i > 0) {
+        filename = `${Date.now()}-${Math.random() * 100 | 0}`;
       }
+
+      fs.writeFile(`${DIGITS_PATH}/${filename}-digit.json`, JSON.stringify(digit), (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
     });
   }
   res.setHeader('content-type', 'application/json');
-  res.end(JSON.stringify({ status: 'success' }));
+  res.end(JSON.stringify({ status: 'success', key: filename }));
 });
 
 app.get('/digits', (req, res) => {
@@ -153,6 +164,58 @@ app.put('/digit', jsonParser, (req, res) => {
   });
 });
 
+app.put('/digits', jsonParser, (req, res) => {
+  res.setHeader('content-type', 'application/json');
+  // if (!req.session.user.admin) {
+  //   res.status(403);
+  //   res.end(JSON.stringify({ error: 'Unauthorized action.' }));
+  //   return;
+  // }
+
+  const { digits, token } = req.body;
+
+  if (!Array.isArray(digits)) {
+    res.status(400);
+    res.end(JSON.stringify({ error: 'Invalid payload format.' }));
+    return;
+  }
+
+  if (!id.match(/\d+-\d+/)) {
+    res.status(404);
+    res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
+    return;
+  }
+
+  if (correct === undefined) {
+    res.status(400);
+    res.end(JSON.stringify({ error: 'Missing required parameter "correct"' }));
+    return;
+  }
+
+  console.log(`Updating digit ${DIGITS_PATH}/${id}-digit.json`);
+  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
+    if (err) {
+      res.status(404);
+      res.end(JSON.stringify({ error: 'Unable to load digit.' }));
+      return;
+    }
+
+    const digit = JSON.parse(file);
+    digit.correct = correct;
+
+    fs.writeFile(`${DIGITS_PATH}/${id}-digit.json`, JSON.stringify(digit), (err) => {
+      if (err) {
+        res.status(404);
+        res.end(JSON.stringify({ error: 'Unable to save digit.' }));
+        return;
+      }
+
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify({ success: true, digit }));
+    });
+  });
+});
+
 app.get('/digit/:id', (req, res) => {
   const id = String(req.params.id);
   if (!id.match(/\d+-\d+/)) {
@@ -206,9 +269,19 @@ app.all('/login', jsonParser, (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  const VM = PORT === 8089;
+  const user = VM ? {
+      "email": "rsilveira@deseretdigital.com",
+      "picture": "https://lh4.googleusercontent.com/-28Ei_gtCvTY/AAAAAAAAAAI/AAAAAAAAF-g/H6FcFwZDRMc/s96-c/photo.jpg",
+      "admin": true
+    } : (req.session.user || {});
+
+      console.log(' >> USER: ', user);
+      console.log(' >> VM: ', VM);
+      console.log(' >> PORT: ', PORT);
   res.render('index', {
     isAndroid: DEV || Boolean(req.headers['user-agent'].match(/android/i)),
-    user: JSON.stringify(req.session.user || {}),
+    user: JSON.stringify(user),
     app: (DEV && !IS_VM) ? 'http://localhost:2001/main.min.js' : `/public/js/${BUNDLE['main.min.js']}`,
     GOOG,
     dev: DEV,
@@ -235,7 +308,7 @@ app.all('/*', (req, res) => {
   res.end(JSON.stringify({ status: 'error' }));
 });
 
-const PORT = process.env.PORT || 8088;
+const PORT = Number(process.env.PORT) || 8088;
 
 const sslOptions = {
   key: fs.readFileSync(`${__dirname}/ssl/private.key`),
