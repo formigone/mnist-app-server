@@ -1,12 +1,12 @@
 {
   "name": "mnist-app-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server/index.js",
   "author": "Rodrigo Silveira",
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
-    "api-server": "APP_ENV=development node index.js --trace-sync-io",
-    "api-server-vm": "PORT=8089 APP_ENV=development IS_VM=1 node index.js --trace-sync-io",
+    "api-server": "APP_ENV=development node server/index.js --trace-sync-io",
+    "api-server-vm": "PORT=8089 APP_ENV=development IS_VM=1 node server/index.js --trace-sync-io",
     "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dev --hot --inline --progress --colors --port 2001",
     "build": "rm public/js/* ; NODE_ENV=production webpack -p --define --progress --colors"
   },

@@ -10,8 +10,8 @@ const GoogleAuth = require('google-auth-library');
 
 const app = express();
 
-const GOOG = JSON.parse(fs.readFileSync(`${__dirname}/goog.json`));
-const BUNDLE = JSON.parse(fs.readFileSync(`${__dirname}/configs/bundles.json`));
+const GOOG = JSON.parse(fs.readFileSync(`${__dirname}/../goog.json`));
+const BUNDLE = JSON.parse(fs.readFileSync(`${__dirname}/../configs/bundles.json`));
 
 const jsonParser = bodyParser.json();
 
@@ -27,7 +27,7 @@ app.use(session({
 
 const DEV = process.env.APP_ENV === 'development';
 const IS_VM = process.env.IS_VM;
-const DIGITS_PATH = `${__dirname}/public/img`;
+const DIGITS_PATH = `${__dirname}/../public/img`;
 const APP_LINKS_CERT = `${__dirname}/.well-known/assetlinks.json`;
 
 app.post('/v1', jsonParser, (req, res) => {
