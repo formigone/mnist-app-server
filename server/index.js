@@ -6,7 +6,7 @@ const session = require('express-session');
 const fs = require('fs');
 const GoogleAuth = require('google-auth-library');
 
-const { fetchSummaries, fetchDigit } = require('./db');
+const { fetchSummaries, fetchDigit, deleteDigits } = require('./db');
 
 const app = express();
 
@@ -67,23 +67,6 @@ app.get('/digits', (req, res) => {
     })
 });
 
-function deleteFiles(files, callback){
-  const file = files.pop();
-  if (!file) {
-    callback();
-  } else {
-    console.log(`Deleting ${file}`);
-    fs.unlink(file, (error) => {
-      if (error) {
-        console.error(error);
-        callback(error);
-      } else {
-        deleteFiles(files, callback);
-      }
-    });
-  }
-}
-
 app.delete('/digit', jsonParser, (req, res) => {
   res.setHeader('content-type', 'application/json');
   if (!req.session.user.admin) {
@@ -92,26 +75,22 @@ app.delete('/digit', jsonParser, (req, res) => {
     return;
   }
 
-  const files = (req.body || [])
-    .filter((file) => file.replace(/[^\d-]/g, ''))
-    .filter((file) => file)
-    .map((file) => `${DIGITS_PATH}/${file}-digit.json`);
-
-  if (files.length === 0) {
+  const ids = (req.body || []).map((id) => Number(id || 0));
+  if (ids.length === 0) {
     res.status(400);
     res.end(JSON.stringify({ error: 'Invalid items.' }));
     return;
   }
 
-  deleteFiles(files, (error) => {
-    if (error) {
+  deleteDigits(ids)
+    .then(() => {
+      res.end(JSON.stringify({ success: `Deleted ${ids.length} item(s)` }));
+    })
+    .catch((error) => {
+      console.error(error);
       res.status(500);
       res.end(JSON.stringify({ error: 'Could not delete file(s).' }));
-      return;
-    }
-
-    res.end(JSON.stringify({ success: `Deleted ${req.body.length} item(s)` }));
-  });
+    });
 });
 
 app.put('/digit', jsonParser, (req, res) => {

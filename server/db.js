@@ -44,8 +44,15 @@ function insertDigits(digits) {
     });
 }
 
+function deleteDigits(ids) {
+  return Digit.sync()
+    .then(() => {
+      Digit.destroy({ where: { id: ids }});
+    });
+}
+
 function fetchSummaries(order = [['id', 'DESC']]) {
-  return Digit.findAll({ attributes: ['id'], order })
+  return Digit.findAll({ attributes: ['id'], order, limit: 50 })
     .then((rows) => rows.map((row) => row.get('id')));
 }
 
@@ -61,4 +68,5 @@ module.exports = {
   insertDigits,
   fetchSummaries,
   fetchDigit,
+  deleteDigits,
 };

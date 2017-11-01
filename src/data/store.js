@@ -28,6 +28,8 @@ class Store extends EventEmitter {
         console.groupEnd();
       }
 
+      state = nextState('status', () => '');
+
       switch (payload.type) {
         case types.DELETE_PROMPT:
           deletePrompt().then(() => this.emitChanges());
@@ -43,6 +45,11 @@ class Store extends EventEmitter {
               .then(() => {
                 state = nextState('status', () => '');
                 this.emitChanges();
+              })
+              .catch((error) => {
+              console.log('ERROR', { error })
+                state = nextState('status', () => String(error));
+                this.emitChanges();
               });
           }, 1000);
           break;
@@ -53,7 +60,7 @@ class Store extends EventEmitter {
         case types.SET_CORRECT:
           state = nextState('status', () => 'Updating...');
           this.emitChanges();
-          setCorrect(payload.key, payload.correct)
+          setCorrect(payload.id, payload.correct)
             .then(() => {
               state = nextState('status', () => '');
               this.emitChanges();
@@ -267,7 +274,7 @@ function getSelected(digits) {
 function selectDigit(digit) {
   return new Promise((resolve) => {
     state = nextState('digits', (digits) => digits.map((row) => {
-      if (row.key === digit.key) {
+      if (row.id === digit.id) {
         row.selected = !(Boolean(row.selected));
       }
       return row;
@@ -336,8 +343,8 @@ function deletePrompt() {
 }
 
 function deleteAll() {
-  return new Promise((resolve) => {
-    const selections = state.selection.map(selection => selection.key);
+  return new Promise((resolve, reject) => {
+    const selections = state.selection.map(selection => selection.id);
     const headers = new Headers();
 
     headers.append('Accept', 'application/json');
@@ -355,9 +362,9 @@ function deleteAll() {
         }
       })
       .then(() => {
-        state.selection.forEach(({ key }) => {
+        state.selection.forEach(({ id }) => {
           try {
-            window.localStorage.removeItem(key);
+            window.localStorage.removeItem(id);
           } catch (e) {
             // ignore
           }
@@ -370,10 +377,11 @@ function deleteAll() {
       .catch((error) => {
         state = nextState('digits', (digits) => digits.map(digit => {
           digit.selected = false;
+          digit.preDelete = false;
           return digit;
         }));
         state = nextState('selection', () => getSelected(state.digits));
-        resolve();
+        reject(error);
       });
   });
 }
@@ -391,7 +399,7 @@ function preDeleteAll() {
   });
 }
 
-function setCorrect(key, correct) {
+function setCorrect(id, correct) {
   return new Promise((resolve) => {
     const headers = new Headers();
 
@@ -401,14 +409,14 @@ function setCorrect(key, correct) {
     fetch(`${API_BASE}/digit`, {
       method: 'PUT',
       credentials: 'include',
-      body: JSON.stringify({ id: key, correct }),
+      body: JSON.stringify({ id, correct }),
       headers,
     })
       .then((res) => res.json())
       .then(() => {
         let data = null;
         state = nextState('digits', (digits) => digits.map((digit) => {
-          if (digit.key === key) {
+          if (digit.id === id) {
             digit.value.correct = correct;
             data = digit;
           }
@@ -416,14 +424,14 @@ function setCorrect(key, correct) {
         }));
         return data;
       })
-      .then((digit) => cache.set(key, digit.value))
+      .then((digit) => cache.set(id, digit.value))
       .then(() => resolve());
   });
 }
 
 function classifyInApp() {
   return new Promise((resolve) => {
-    const data = state.selection.map(({ key, value: { pixels }}) => ({ id: key, pixels }));
+    const data = state.selection.map(({ id, value: { pixels }}) => ({ id, pixels }));
     const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify(data))};end`;
     window.location.href = href;
     resolve();
