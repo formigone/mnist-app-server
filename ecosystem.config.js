@@ -2,10 +2,10 @@ module.exports = {
   apps: [
     {
       name: 'mnist',
-      script: './index.js',
+      script: './server/index.js',
       watch: false,
       env: {
-        'PORT': 669,
+        'PORT': 3003,
         'NODE_ENV': 'production'
       }
     }

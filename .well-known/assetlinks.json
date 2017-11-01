@@ -1,9 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "mnist.ai.formigone.com.mnistapp",
-    "sha256_cert_fingerprints":
-    ["F4:EC:9C:6B:A7:B0:54:42:90:CF:E6:5C:33:E6:68:2E:78:C7:E4:1D:B1:DA:0E:A0:AB:9F:90:77:2D:BF:E8:27"]
-  }
-}]

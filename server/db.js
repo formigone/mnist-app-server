@@ -44,11 +44,16 @@ function insertDigits(digits) {
     });
 }
 
-function selectDigits(offset, limit) {
-  return Promise.resolve([]);
+function selectDigits(offset, limit, order = [['id', 'DESC']]) {
+  return Digit.findAll({ offset, limit, order, attributes: ['id', 'prediction'], group: ['prediction'] });
+}
+
+function findDigits(filter) {
+  return Digit.findAll(filter);
 }
 
 module.exports = {
   insertDigits,
   selectDigits,
+  findDigits,
 };

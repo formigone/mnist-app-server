@@ -1,8 +1,6 @@
 const compression = require('compression');
 const morgan = require('morgan');
 const express = require('express');
-const http = require('http');
-const https = require('https');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const fs = require('fs');
@@ -28,7 +26,6 @@ app.use(session({
 const DEV = process.env.APP_ENV === 'development';
 const IS_VM = process.env.IS_VM;
 const DIGITS_PATH = `${__dirname}/../public/img`;
-const APP_LINKS_CERT = `${__dirname}/.well-known/assetlinks.json`;
 
 app.post('/v1', jsonParser, (req, res) => {
   let filename = `${Date.now()}-${Math.random() * 100 | 0}`;
@@ -289,19 +286,6 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/.well-known/assetlinks.json', (req, res) => {
-  res.setHeader('content-type', 'application/json');
-  fs.readFile(APP_LINKS_CERT, function (err, cert) {
-    if (err) {
-      res.status(404);
-      console.error(err);
-      res.end(JSON.stringify({ error: 'Cert not found.' }));
-    }
-
-    res.end(cert);
-  });
-});
-
 app.all('/*', (req, res) => {
   res.setHeader('content-type', 'application/json');
   res.status(404);
@@ -310,14 +294,5 @@ app.all('/*', (req, res) => {
 
 const PORT = Number(process.env.PORT) || 8088;
 
-const sslOptions = {
-  key: fs.readFileSync(`${__dirname}/ssl/private.key`),
-  cert: fs.readFileSync(`${__dirname}/ssl/certificate.crt`),
-};
-
-if (DEV) {
-  app.listen(PORT);
-} else {
-  https.createServer(sslOptions, app).listen(PORT);
-}
+app.listen(PORT);
 console.log(`${new Date()}  Server running on :${PORT}`);
