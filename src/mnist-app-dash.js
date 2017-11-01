@@ -58,18 +58,18 @@ class MnistAppDash extends PureComponent {
           selection={state.selection}
           allSelected={state.selection.length === state.digits.length} />
         <div className="container">
-          {state.digits.map(digit => (digit.value ? (
+          {state.digits.map((digit) => (
               <Card
-                key={digit.key}
-                pixels={digit.value.pixels}
-                prediction={digit.value.prediction}
-                actual={digit.value.correct}
+                key={digit.id}
+                pixels={digit.pixels}
+                prediction={digit.prediction}
+                actual={digit.correct}
                 selected={digit.selected}
                 preDelete={digit.preDelete}
                 onClick={() => {
                   actions.select(digit)
                 }} />
-            ) : null))}
+            ))}
         </div>
         <h1>{state.modals.login}</h1>
         <div style={{ display: (state.modals.login ? 'block' : 'none') }}>
@@ -92,7 +92,7 @@ class MnistAppDash extends PureComponent {
         {state.modals.details && (
           <Modal>
             <ModalContent>
-              {state.selection.map((digit) => <DigitDetail key={digit.key} {...digit.value} onSetCorrect={(correct) => actions.setCorrect(digit.key, correct)} />)}
+              {state.selection.map((digit) => <DigitDetail key={digit.id} {...digit} onSetCorrect={(correct) => actions.setCorrect(digit.id, correct)} />)}
             </ModalContent>
           </Modal>
         )}

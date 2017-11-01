@@ -48,6 +48,10 @@ canvas {
     }
 }
 
+.card-loading {
+    opacity: 0.25;
+}
+
 .card-toolbar {
     list-style: none;
     margin: 0;

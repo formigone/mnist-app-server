@@ -6,6 +6,8 @@ const session = require('express-session');
 const fs = require('fs');
 const GoogleAuth = require('google-auth-library');
 
+const { fetchSummaries, fetchDigit } = require('./db');
+
 const app = express();
 
 const GOOG = JSON.parse(fs.readFileSync(`${__dirname}/../goog.json`));
@@ -26,6 +28,7 @@ app.use(session({
 const DEV = process.env.APP_ENV === 'development';
 const IS_VM = process.env.IS_VM;
 const DIGITS_PATH = `${__dirname}/../public/img`;
+const BATCH_SIZE = 25;
 
 app.post('/v1', jsonParser, (req, res) => {
   let filename = `${Date.now()}-${Math.random() * 100 | 0}`;
@@ -52,21 +55,16 @@ app.post('/v1', jsonParser, (req, res) => {
 });
 
 app.get('/digits', (req, res) => {
-  fs.readdir(DIGITS_PATH, function (err, files) {
-    if (err) {
-      res.status(404);
-      res.end(JSON.stringify({ error: 'Could not find digits map.' }));
-    }
-
-    files = files.map(file => {
-      const str = file.match(/(\d+-\d+)/);
-      return str ? str[1] : null;
-    }).filter(file => file);
-    console.log(`${files.length} digits found`);
-    files = files.reverse();
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify(files));
-  });
+  res.setHeader('content-type', 'application/json');
+  fetchSummaries()
+    .then((digits) => {
+      res.end(JSON.stringify(digits));
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500);
+      res.end(JSON.stringify({ error: 'Something went wrong.'}));
+    })
 });
 
 function deleteFiles(files, callback){
@@ -214,22 +212,16 @@ app.put('/digits', jsonParser, (req, res) => {
 });
 
 app.get('/digit/:id', (req, res) => {
-  const id = String(req.params.id);
-  if (!id.match(/\d+-\d+/)) {
-    res.status(404);
-    res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
-    return;
-  }
+  res.setHeader('content-type', 'application/json');
+  const id = Number(req.params.id || 0);
 
-  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
-    if (err) {
+  fetchDigit(id)
+    .then((digit) => res.end(JSON.stringify(digit)))
+    .catch((error) => {
+      console.error(error);
       res.status(404);
-      res.end(JSON.stringify({ error: 'Unable to load digit.' }));
-      return;
-    }
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify(JSON.parse(file)));
-  });
+      res.end(JSON.stringify({ error: 'Digit not found.' }));
+    });
 });
 
 app.all('/logout', (req, res) => {
@@ -273,9 +265,6 @@ app.get('/', (req, res) => {
       "admin": true
     } : (req.session.user || {});
 
-      console.log(' >> USER: ', user);
-      console.log(' >> VM: ', VM);
-      console.log(' >> PORT: ', PORT);
   res.render('index', {
     isAndroid: DEV || Boolean(req.headers['user-agent'].match(/android/i)),
     user: JSON.stringify(user),

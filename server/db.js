@@ -44,16 +44,21 @@ function insertDigits(digits) {
     });
 }
 
-function selectDigits(offset, limit, order = [['id', 'DESC']]) {
-  return Digit.findAll({ offset, limit, order, attributes: ['id', 'prediction'], group: ['prediction'] });
+function fetchSummaries(order = [['id', 'DESC']]) {
+  return Digit.findAll({ attributes: ['id'], order })
+    .then((rows) => rows.map((row) => row.get('id')));
 }
 
-function findDigits(filter) {
-  return Digit.findAll(filter);
+function fetchDigit(id) {
+  return Digit.findOne({ where: { id }})
+    .then((row) => Object.assign(row.dataValues,
+      { pixels: row.get('pixels') },
+      { predictions: row.get('predictions') }
+    ));
 }
 
 module.exports = {
   insertDigits,
-  selectDigits,
-  findDigits,
+  fetchSummaries,
+  fetchDigit,
 };

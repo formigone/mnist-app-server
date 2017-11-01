@@ -91,14 +91,17 @@ class Store extends EventEmitter {
           loadDigits()
             .then(() => {
               this.emitChanges();
+              return new Promise((resolve) => {
+                setTimeout(() => resolve(), 100);
+              });
             })
             .then(() => {
               let loaded = 0;
               const next = (digits, i) => {
-                loadDigit(digits[i].key)
-                  .then((cache) => {
+                loadDigit(digits[i].id)
+                  .then(() => {
                     loaded += 1;
-                    if (!cache && loaded % 25 === 0) {
+                    if (loaded % 50 === 0) {
                       this.emitChanges();
                     }
 
@@ -223,35 +226,36 @@ function loadDigits() {
     fetch(`${API_BASE}/digits`)
       .then(res => res.json())
       .then(digits => {
-        state = nextState('digits', () => digits.map((digit) => ({ key: digit })));
+        state = nextState('digits', () => digits.map((id) => ({ id })));
         resolve();
       });
   });
 }
 
-function loadDigit(key) {
+function loadDigit(id) {
   return new Promise((resolve, reject) => {
-    cache.get(key)
+    cache.get(id)
       .then((digit) => {
         if (digit) {
-          return { digit, cache: true };
+          return digit;
         }
 
-        return fetch(`${API_BASE}/digit/${key}`)
+        return fetch(`${API_BASE}/digit/${id}`)
           .then((res) => res.json())
           .then((digit) => {
-            cache.set(key, digit);
-            return { digit, cache: false };
+          console.log('DIGIT', { digit })
+            cache.set(id, digit);
+            return digit;
           });
       })
-      .then(({ digit, cache }) => {
+      .then((digit) => {
         state = nextState('digits', (digits) => digits.map((row) => {
-          if (row.key === key) {
-            row.value = digit;
+          if (row.id === id) {
+            row = digit;
           }
           return row;
         }));
-        resolve(cache);
+        resolve();
       });
   });
 }
