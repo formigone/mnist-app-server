@@ -3,11 +3,11 @@ import React from 'react';
 
 import Canvas from './Canvas';
 
-const Digit = ({ prediction, correct, pixels, percentages, onSetCorrect }) => {
+const Digit = ({ prediction, actual, pixels = [], percentages = [], onSetActual }) => {
   percentages = normalize(percentages);
   return (
     <div className="digit-details">
-      <Prediction prediction={prediction} correct={correct} onSetCorrect={onSetCorrect} />
+      <Prediction prediction={prediction} correct={actual !== undefined && prediction === actual} onSetActual={onSetActual} />
       <Canvas pixels={pixels} className="digit-details_sample"/>
       <BarGraph percentages={percentages} />
       <Summary percentages={percentages} />
@@ -23,13 +23,13 @@ Digit.propTypes = {
   onSetCorrect: PropTypes.func,
 };
 
-const Prediction = ({ prediction, correct, onSetCorrect }) => (
+const Prediction = ({ prediction, correct, onSetActual }) => (
   <ul className="prediction-container">
-    <li onClick={() => onSetCorrect(true)} className={correct === true ? 'prediction-correct' : ''}>
+    <li onClick={() => onSetActual(prediction)} className={correct === true ? 'prediction-correct' : ''}>
       <span className="fa fa-chevron-up"/>
     </li>
     <li className="prediction">{prediction || '--'}</li>
-    <li onClick={() => onSetCorrect(false)} className={correct === false ? 'prediction-wrong' : ''}>
+    <li onClick={() => onSetActual(false)} className={correct === false ? 'prediction-wrong' : ''}>
       <span className="fa fa-chevron-down"/>
     </li>
   </ul>

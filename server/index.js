@@ -6,7 +6,7 @@ const session = require('express-session');
 const fs = require('fs');
 const GoogleAuth = require('google-auth-library');
 
-const { fetchSummaries, fetchDigit, deleteDigits } = require('./db');
+const { fetchSummaries, fetchDigit, deleteDigits, updateDigit } = require('./db');
 
 const app = express();
 
@@ -101,93 +101,16 @@ app.put('/digit', jsonParser, (req, res) => {
     return;
   }
 
-  const { id, correct } = req.body;
-  if (!id.match(/\d+-\d+/)) {
-    res.status(404);
-    res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
-    return;
-  }
+  const id = Number(req.body.id || 0);
+  const actual = Number(req.body.actual || 0);
 
-  if (correct === undefined) {
-    res.status(400);
-    res.end(JSON.stringify({ error: 'Missing required parameter "correct"' }));
-    return;
-  }
-
-  console.log(`Updating digit ${DIGITS_PATH}/${id}-digit.json`);
-  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
-    if (err) {
+  updateDigit(id, actual)
+    .then(() => res.end(JSON.stringify({ success: true })))
+    .catch((error) => {
+      console.error(error);
       res.status(404);
-      res.end(JSON.stringify({ error: 'Unable to load digit.' }));
-      return;
-    }
-
-    const digit = JSON.parse(file);
-    digit.correct = correct;
-
-    fs.writeFile(`${DIGITS_PATH}/${id}-digit.json`, JSON.stringify(digit), (err) => {
-      if (err) {
-        res.status(404);
-        res.end(JSON.stringify({ error: 'Unable to save digit.' }));
-        return;
-      }
-
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ success: true, digit }));
+      res.end(JSON.stringify({ error: 'Unable to update digit.' }));
     });
-  });
-});
-
-app.put('/digits', jsonParser, (req, res) => {
-  res.setHeader('content-type', 'application/json');
-  // if (!req.session.user.admin) {
-  //   res.status(403);
-  //   res.end(JSON.stringify({ error: 'Unauthorized action.' }));
-  //   return;
-  // }
-
-  const { digits, token } = req.body;
-
-  if (!Array.isArray(digits)) {
-    res.status(400);
-    res.end(JSON.stringify({ error: 'Invalid payload format.' }));
-    return;
-  }
-
-  if (!id.match(/\d+-\d+/)) {
-    res.status(404);
-    res.end(JSON.stringify({ error: 'Invalid digit ID.' }));
-    return;
-  }
-
-  if (correct === undefined) {
-    res.status(400);
-    res.end(JSON.stringify({ error: 'Missing required parameter "correct"' }));
-    return;
-  }
-
-  console.log(`Updating digit ${DIGITS_PATH}/${id}-digit.json`);
-  fs.readFile(`${DIGITS_PATH}/${id}-digit.json`, 'utf8', (err, file) => {
-    if (err) {
-      res.status(404);
-      res.end(JSON.stringify({ error: 'Unable to load digit.' }));
-      return;
-    }
-
-    const digit = JSON.parse(file);
-    digit.correct = correct;
-
-    fs.writeFile(`${DIGITS_PATH}/${id}-digit.json`, JSON.stringify(digit), (err) => {
-      if (err) {
-        res.status(404);
-        res.end(JSON.stringify({ error: 'Unable to save digit.' }));
-        return;
-      }
-
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ success: true, digit }));
-    });
-  });
 });
 
 app.get('/digit/:id', (req, res) => {

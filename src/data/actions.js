@@ -17,7 +17,7 @@ export const types = {
   LOGOUT: 'logout',
   DELETE_PROMPT: 'delete-prompt',
   DELETE: 'delete',
-  SET_CORRECT: 'set-correct',
+  SET_ACTUAL: 'set-actual',
   CLASSIFY: 'classify',
 };
 
@@ -49,8 +49,8 @@ const Actions = {
   deleteAll() {
     return dispatcher.dispatch(genPayload(types.DELETE));
   },
-  setCorrect(key, correct) {
-    return dispatcher.dispatch(genPayload(types.SET_CORRECT, { key, correct }));
+  setActual(id, actual) {
+    return dispatcher.dispatch(genPayload(types.SET_ACTUAL, { id, actual }));
   },
   classify() {
     return dispatcher.dispatch(genPayload(types.CLASSIFY));

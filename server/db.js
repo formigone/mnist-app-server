@@ -44,6 +44,13 @@ function insertDigits(digits) {
     });
 }
 
+function updateDigit(id, actual) {
+  return Digit.findOne({ where: { id }})
+    .then((digit) => {
+      return digit.update({ actual });
+    });
+}
+
 function deleteDigits(ids) {
   return Digit.sync()
     .then(() => {
@@ -60,7 +67,7 @@ function fetchDigit(id) {
   return Digit.findOne({ where: { id }})
     .then((row) => Object.assign(row.dataValues,
       { pixels: row.get('pixels') },
-      { predictions: row.get('predictions') }
+      { percentages: row.get('percentages') }
     ));
 }
 
@@ -69,4 +76,5 @@ module.exports = {
   fetchSummaries,
   fetchDigit,
   deleteDigits,
+  updateDigit,
 };

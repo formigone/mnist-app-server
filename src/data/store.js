@@ -57,10 +57,10 @@ class Store extends EventEmitter {
           classifyInApp()
             .then(() => this.emitChanges());
           break;
-        case types.SET_CORRECT:
+        case types.SET_ACTUAL:
           state = nextState('status', () => 'Updating...');
           this.emitChanges();
-          setCorrect(payload.id, payload.correct)
+          setActual(payload.id, payload.actual)
             .then(() => {
               state = nextState('status', () => '');
               this.emitChanges();
@@ -399,7 +399,7 @@ function preDeleteAll() {
   });
 }
 
-function setCorrect(id, correct) {
+function setActual(id, actual) {
   return new Promise((resolve) => {
     const headers = new Headers();
 
@@ -409,7 +409,7 @@ function setCorrect(id, correct) {
     fetch(`${API_BASE}/digit`, {
       method: 'PUT',
       credentials: 'include',
-      body: JSON.stringify({ id, correct }),
+      body: JSON.stringify({ id, actual }),
       headers,
     })
       .then((res) => res.json())
@@ -417,14 +417,15 @@ function setCorrect(id, correct) {
         let data = null;
         state = nextState('digits', (digits) => digits.map((digit) => {
           if (digit.id === id) {
-            digit.value.correct = correct;
+            digit.actual = actual;
+            digit.selected = false;
             data = digit;
           }
           return digit;
         }));
         return data;
       })
-      .then((digit) => cache.set(id, digit.value))
+      .then((digit) => cache.set(id, digit))
       .then(() => resolve());
   });
 }
