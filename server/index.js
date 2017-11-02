@@ -6,7 +6,7 @@ const session = require('express-session');
 const fs = require('fs');
 const GoogleAuth = require('google-auth-library');
 
-const { fetchSummaries, fetchDigit, deleteDigits, updateDigit } = require('./db');
+const { fetchSummaries, fetchDigit, deleteDigits, updateDigit, insertDigits } = require('./db');
 
 const app = express();
 
@@ -31,27 +31,22 @@ const DIGITS_PATH = `${__dirname}/../public/img`;
 const BATCH_SIZE = 25;
 
 app.post('/v1', jsonParser, (req, res) => {
-  let filename = `${Date.now()}-${Math.random() * 100 | 0}`;
+  res.setHeader('content-type', 'application/json');
   const body = req.body;
   if (body) {
     if (!Array.isArray(body.digits)) {
       body.digits = [Object.assign({}, body)];
     }
 
-    body.digits.forEach((digit, i) => {
-      if (i > 0) {
-        filename = `${Date.now()}-${Math.random() * 100 | 0}`;
-      }
-
-      fs.writeFile(`${DIGITS_PATH}/${filename}-digit.json`, JSON.stringify(digit), (err) => {
-        if (err) {
-          console.error(err);
-        }
+    insertDigits(body.digits)
+      .then(() => {
+        res.end(JSON.stringify({ status: 'success' }));
+      })
+      .catch((error) => {
+        console.error(error);
+        res.end(JSON.stringify({ status: 'error', error }));
       });
-    });
   }
-  res.setHeader('content-type', 'application/json');
-  res.end(JSON.stringify({ status: 'success', key: filename }));
 });
 
 app.get('/digits', (req, res) => {
