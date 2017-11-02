@@ -1,7 +1,6 @@
 {
   "name": "mnist-app-server",
   "version": "1.0.0",
-  "main": "server/index.js",
   "author": "Rodrigo Silveira",
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
