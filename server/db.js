@@ -59,7 +59,7 @@ function deleteDigits(ids) {
 }
 
 function fetchSummaries(order = [['id', 'DESC']]) {
-  return Digit.findAll({ attributes: ['id'], order, limit: 50 })
+  return Digit.findAll({ attributes: ['id'], order })
     .then((rows) => rows.map((row) => row.get('id')));
 }
 
