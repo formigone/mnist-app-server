@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
   config.logging = false;
 }
 
-const conn = new Sequelize('mnist_test', '', '', config);
+const conn = new Sequelize('', '', '', config);
 
 const Digit = conn.define('digit', {
   pixels: {

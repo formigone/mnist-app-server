@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { PureComponent } from 'react';
 
 import Canvas from './Canvas';
 
@@ -7,7 +7,7 @@ const Digit = ({ prediction, actual, pixels = [], percentages = [], onSetActual 
   percentages = normalize(percentages);
   return (
     <div className="digit-details">
-      <Prediction prediction={prediction} correct={actual !== undefined && prediction === actual} onSetActual={onSetActual} />
+      <Prediction prediction={prediction} actual={actual} onSetActual={onSetActual} />
       <Canvas pixels={pixels} className="digit-details_sample"/>
       <BarGraph percentages={percentages} />
       <Summary percentages={percentages} />
@@ -17,23 +17,55 @@ const Digit = ({ prediction, actual, pixels = [], percentages = [], onSetActual 
 
 Digit.propTypes = {
   prediction: PropTypes.number,
-  correct: PropTypes.bool,
+  actual: PropTypes.number,
   pixels: PropTypes.arrayOf(PropTypes.number),
   percentages: PropTypes.arrayOf(PropTypes.number),
   onSetCorrect: PropTypes.func,
 };
 
-const Prediction = ({ prediction, correct, onSetActual }) => (
-  <ul className="prediction-container">
-    <li onClick={() => onSetActual(prediction)} className={correct === true ? 'prediction-correct' : ''}>
-      <span className="fa fa-chevron-up"/>
-    </li>
-    <li className="prediction">{prediction || '--'}</li>
-    <li onClick={() => onSetActual(false)} className={correct === false ? 'prediction-wrong' : ''}>
-      <span className="fa fa-chevron-down"/>
-    </li>
-  </ul>
-);
+class Prediction extends PureComponent {
+  static propTypes = {
+    prediction: PropTypes.number,
+    actual: PropTypes.number,
+    onSetActual: PropTypes.func,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSelection: false,
+    };
+  }
+
+  makeSelection(value) {
+    this.props.onSetActual(value);
+    this.setState({ showSelection: false });
+  }
+
+  render (){
+    const { showSelection } = this.state;
+    const { actual, prediction, onSetActual } = this.props;
+
+    return (
+      <ul className="prediction-container">
+        <li onClick={() => onSetActual(prediction)} className={actual !== null && prediction === actual ? 'prediction-correct' : ''}>
+          <span className="fa fa-chevron-up" />
+        </li>
+        <li className="prediction">{prediction || '--'}</li>
+        <li className={actual !== null && prediction !== actual ? 'prediction-wrong' : ''}>
+          {showSelection && (
+            <select onChange={({target}) => this.makeSelection(Number(target.value))}>
+              {['-', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((val) => (<option value={val} key={val}>{val}</option>))}
+            </select>
+          )}
+          {!showSelection && (
+            <span className="fa fa-chevron-down" onClick={() => this.setState({ showSelection: true })} />
+          )}
+        </li>
+      </ul>
+    );
+  }
+};
 
 const BarGraph = ({ percentages = [] }) => (
   <ul className="bar-graph">

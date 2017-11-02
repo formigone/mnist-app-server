@@ -432,7 +432,7 @@ function setActual(id, actual) {
 
 function classifyInApp() {
   return new Promise((resolve) => {
-    const data = state.selection.map(({ id, value: { pixels }}) => ({ id, pixels }));
+    const data = state.selection.map(({ id, pixels }) => ({ id, pixels }));
     const href = `intent:#Intent;action=android.intent.action.SEND;type=text/mnist;S.android.intent.extra.TEXT=${encodeURIComponent(JSON.stringify(data))};end`;
     window.location.href = href;
     resolve();
