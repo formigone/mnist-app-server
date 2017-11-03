@@ -51,7 +51,7 @@ class Prediction extends PureComponent {
         <li onClick={() => onSetActual(prediction)} className={actual !== null && prediction === actual ? 'prediction-correct' : ''}>
           <span className="fa fa-chevron-up" />
         </li>
-        <li className="prediction">{prediction || '--'}</li>
+        <li className="prediction">{prediction === null ? '--' : prediction}</li>
         <li className={actual !== null && prediction !== actual ? 'prediction-wrong' : ''}>
           {showSelection && (
             <select onChange={({target}) => this.makeSelection(Number(target.value))}>
