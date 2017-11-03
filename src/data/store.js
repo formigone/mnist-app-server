@@ -108,7 +108,7 @@ class Store extends EventEmitter {
                 loadDigit(digits[i].id)
                   .then(() => {
                     loaded += 1;
-                    if (loaded % 50 === 0) {
+                    if (loaded < 25 || loaded % 50 === 0) {
                       this.emitChanges();
                     }
 
